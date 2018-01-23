@@ -202,8 +202,8 @@ def configure(keymap):
     use_emacs_shift_mode = False
 
     # IME を切り替えるキーを指定する（複数指定可）
-    # toggle_input_method_key = ["C-Yen"]
-    toggle_input_method_key = ["C-Yen", "C-o"]
+    toggle_input_method_key = ["C-Yen"]
+    # toggle_input_method_key = ["C-Yen", "C-o"]
 
     # C-iキーを Tabキーとして使うかどうかを指定する（True: 使う、False: 使わない）
     use_ctrl_i_as_tab = True
@@ -383,6 +383,31 @@ def configure(keymap):
 
             # IME の状態をバルーンヘルプで表示する
             keymap.popBalloon("ime_status", message, 500)
+
+    def enable_input_method():
+        keymap.wnd.setImeStatus(1)
+        delay(0.05)
+        display_input_method_status()
+
+    def disable_input_method():
+        keymap.wnd.setImeStatus(0)
+        delay(0.05)
+        display_input_method_status()
+
+    def display_input_method_status():
+        # IME の状態を格納する
+        ime_status = keymap.getWindow().getImeStatus()
+        if use_emacs_ime_mode:
+            fakeymacs.ei_ime_status = ime_status
+
+        if not fakeymacs.is_playing_kmacro:
+             if ime_status:
+                 message = "あ"
+             else:
+                 message = "A"
+
+             # IME の状態をバルーンヘルプで表示する
+             keymap.popBalloon("ime_status", message, 200)
 
     ##################################################
     ## ファイル操作
@@ -836,7 +861,7 @@ def configure(keymap):
 
             elif (checkWindow("powershell.exe$", "ConsoleWindowClass$") or # PowerShell
                   checkWindow("EXCEL.EXE", None) or                        # Microsoft Excel
-                  checkWindow(None, "Edit$")):                             # NotePad 等                  
+                  checkWindow(None, "Edit$")):                             # NotePad 等
                 # 選択されているリージョンのハイライトを解除するためにカーソルを移動する
                 if fakeymacs.forward_direction:
                     self_insert_command("Left", "Right")()
@@ -946,6 +971,7 @@ def configure(keymap):
     define_key(keymap_emacs, "Ctl-x",         keymap.defineMultiStrokeKeymap(ctl_x_prefix_key))
     define_key(keymap_emacs, "C-q",           keymap.defineMultiStrokeKeymap("C-q"))
     define_key(keymap_emacs, "C-OpenBracket", keymap.defineMultiStrokeKeymap("C-OpenBracket"))
+    define_key(keymap_emacs, "C-o",           keymap.defineMultiStrokeKeymap("C-o"))
     if use_esc_as_meta:
         define_key(keymap_emacs, "Esc", keymap.defineMultiStrokeKeymap("Esc"))
 
@@ -1022,6 +1048,9 @@ def configure(keymap):
     define_key(keymap_ime,   "(243)",  toggle_input_method)
     define_key(keymap_ime,   "(244)",  toggle_input_method)
     define_key(keymap_ime,   "A-(25)", toggle_input_method)
+
+    define_key(keymap_emacs, "C-o C-o", enable_input_method)
+    define_key(keymap_emacs, "C-o C-i", disable_input_method)
 
     ## 「ファイル操作」のキー設定
     define_key(keymap_emacs, "Ctl-x C-f", reset_search(reset_undo(reset_counter(reset_mark(find_file)))))
