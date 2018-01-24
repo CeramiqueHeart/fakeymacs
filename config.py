@@ -213,7 +213,8 @@ def configure(keymap):
     use_ctrl_i_as_tab = True
 
     # Escキーを Metaキーとして使うかどうかを指定する（True: 使う、False: 使わない）
-    use_esc_as_meta = True
+    # use_esc_as_meta = True
+    use_esc_as_meta = False
 
     # Ctl-xプレフィックスキーに使うキーを指定する
     # （Ctl-xプレフィックスキーのモディファイアキーは、Ctrl または Alt のいずれかから指定してください）
@@ -1780,7 +1781,7 @@ def configure(keymap):
     ####################################################################################################
     ## Excel の場合、C-Enter に F2（セル編集モード移行）を割り当てる（オプション）
     ####################################################################################################
-    if 0:
+    if 1:
         keymap_excel = keymap.defineWindowKeymap(class_name="EXCEL*")
 
         # C-Enter 押下で、「セル編集モード」に移行する
