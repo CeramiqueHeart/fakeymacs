@@ -153,7 +153,9 @@ def configure(keymap):
                             "ttermpro.exe",       # TeraTerm
                             "MobaXterm.exe",      # MobaXterm
                             "TurboVNC.exe",       # TurboVNC
-                            "vncviewer.exe"]      # UltraVNC
+                            "vncviewer.exe",      # UltraVNC
+                            "Poderosa.exe",       # Poderosa
+                            "mstsc.exe"]          # Remote Desktop
 
     # IME の切り替え“のみをしたい”アプリケーションソフトを指定する
     # （指定できるアプリケーションソフトは、not_emacs_target で（除外）指定したものからのみとなります）
@@ -175,7 +177,8 @@ def configure(keymap):
     not_clipboard_target = ["EXCEL.EXE"]          # Excel
 
     # 日本語キーボードかどうかを指定する（True: 日本語キーボード、False: 英語キーボード）
-    is_japanese_keyboard = True
+    # is_japanese_keyboard = True
+    is_japanese_keyboard = False
 
     # 左右どちらの Ctrlキーを使うかを指定する（"L": 左、"R": 右）
     side_of_ctrl_key = "L"
@@ -188,7 +191,8 @@ def configure(keymap):
     use_region_reset = True
 
     # emacs日本語入力モードを使うかどうかを指定する（True: 使う、False: 使わない）
-    use_emacs_ime_mode = True
+    # use_emacs_ime_mode = True
+    use_emacs_ime_mode = False
 
     # emacs日本語入力モードを切り替える（トグルする）キーを指定する
     # toggle_emacs_ime_mode_key = None
@@ -202,8 +206,8 @@ def configure(keymap):
     use_emacs_shift_mode = False
 
     # IME を切り替えるキーを指定する（複数指定可）
-    toggle_input_method_key = ["C-Yen"]
     # toggle_input_method_key = ["C-Yen", "C-o"]
+    toggle_input_method_key = ["C-Yen"]
 
     # C-iキーを Tabキーとして使うかどうかを指定する（True: 使う、False: 使わない）
     use_ctrl_i_as_tab = True
@@ -271,6 +275,8 @@ def configure(keymap):
     # コマンドのリピート回数の最大値を指定する
     repeat_max = 1024
 
+    # C-[数字] 等のコマンドを有効にするかどうかを指定する（True: 使う、False: 使わない）
+    use_digit_key = False
 
     ####################################################################################################
     ## 基本設定
@@ -976,14 +982,15 @@ def configure(keymap):
         define_key(keymap_emacs, "Esc", keymap.defineMultiStrokeKeymap("Esc"))
 
     ## 数字キーの設定
-    for key in range(10):
-        s_key = str(key)
-        define_key(keymap_emacs,        s_key, digit(key))
-        define_key(keymap_emacs, "C-" + s_key, digit2(key))
-        define_key(keymap_emacs, "M-" + s_key, digit2(key))
-        define_key(keymap_emacs, "S-" + s_key, reset_undo(reset_counter(reset_mark(repeat(self_insert_command2("S-" + s_key))))))
-        define_key(keymap_ime,          s_key, self_insert_command2(       s_key))
-        define_key(keymap_ime,   "S-" + s_key, self_insert_command2("S-" + s_key))
+    if use_digit_key:
+        for key in range(10):
+            s_key = str(key)
+            define_key(keymap_emacs,        s_key, digit(key))
+            define_key(keymap_emacs, "C-" + s_key, digit2(key))
+            define_key(keymap_emacs, "M-" + s_key, digit2(key))
+            define_key(keymap_emacs, "S-" + s_key, reset_undo(reset_counter(reset_mark(repeat(self_insert_command2("S-" + s_key))))))
+            define_key(keymap_ime,          s_key, self_insert_command2(       s_key))
+            define_key(keymap_ime,   "S-" + s_key, self_insert_command2("S-" + s_key))
 
     ## アルファベットキーの設定
     for vkey in range(VK_A, VK_Z + 1):
