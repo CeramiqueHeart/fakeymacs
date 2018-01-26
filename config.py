@@ -279,6 +279,9 @@ def configure(keymap):
     # C-[数字] 等のコマンドを有効にするかどうかを指定する（True: 使う、False: 使わない）
     use_digit_key = False
 
+    # C-g でアプリケーションに対して ESC を発行するかどうかを指定する (True: 発行する、False: 発行しない)
+    use_ctrl_g_as_esc = False
+
     ####################################################################################################
     ## 基本設定
     ####################################################################################################
@@ -721,8 +724,9 @@ def configure(keymap):
         reset_region()
 
         # Microsoft Excel または Evernote 以外の場合、Esc を発行する
-        if not (checkWindow("EXCEL.EXE$", "EXCEL") or checkWindow("Evernote.exe$", "WebViewHost$")):
-            self_insert_command("Esc")()
+        if use_ctrl_g_as_esc:
+            if not (checkWindow("EXCEL.EXE$", "EXCEL") or checkWindow("Evernote.exe$", "WebViewHost$")):
+                self_insert_command("Esc")()
 
         keymap.command_RecordStop()
 
