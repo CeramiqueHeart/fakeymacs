@@ -155,6 +155,7 @@ def configure(keymap):
                             "TurboVNC.exe",       # TurboVNC
                             "vncviewer.exe",      # UltraVNC
                             "Poderosa.exe",       # Poderosa
+                            "RLogin.exe",         # RLogin
                             "mstsc.exe"]          # Remote Desktop
 
     # IME の切り替え“のみをしたい”アプリケーションソフトを指定する
@@ -171,6 +172,8 @@ def configure(keymap):
                             "xyzzy.exe",          # xyzzy
                             "putty.exe",          # PuTTY
                             "ttermpro.exe",       # TeraTerm
+                            "Poderosa.exe",       # Poderosa
+                            "RLogin.exe",         # RLogin
                             "MobaXterm.exe"]      # MobaXterm
 
     # clipboard 監視の対象外とするアプリケーションソフトを指定する
@@ -999,6 +1002,7 @@ def configure(keymap):
     define_key(keymap_emacs, "C-q",           keymap.defineMultiStrokeKeymap("C-q"))
     define_key(keymap_emacs, "C-OpenBracket", keymap.defineMultiStrokeKeymap("C-OpenBracket"))
     define_key(keymap_emacs, "C-o",           keymap.defineMultiStrokeKeymap("C-o"))
+    define_key(keymap_ime,   "C-o",           keymap.defineMultiStrokeKeymap("C-o"))
     if use_esc_as_meta:
         define_key(keymap_emacs, "Esc", keymap.defineMultiStrokeKeymap("Esc"))
 
@@ -1079,6 +1083,8 @@ def configure(keymap):
 
     define_key(keymap_emacs, "C-o C-o", enable_input_method)
     define_key(keymap_emacs, "C-o C-i", disable_input_method)
+    define_key(keymap_ime,   "C-o C-o", enable_input_method)
+    define_key(keymap_ime,   "C-o C-i", disable_input_method)
 
     ## 「ファイル操作」のキー設定
     define_key(keymap_emacs, "Ctl-x C-f", reset_search(reset_undo(reset_counter(reset_mark(find_file)))))
