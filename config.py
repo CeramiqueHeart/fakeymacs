@@ -2,7 +2,7 @@
 
 ##                               nickname: Fakeymacs
 ##
-## Windows の操作を emacs のキーバインドで行うための設定（Keyhac版）ver.20180410_01
+## Windows の操作を emacs のキーバインドで行うための設定（Keyhac版）ver.20180601_01
 ##
 
 # このスクリプトは、Keyhac for Windows ver 1.75 以降で動作します。
@@ -85,6 +85,8 @@
 #   この設定では、Sakura Editor のみ対応している。
 # ・キーボードマクロは emacs の挙動と異なり、IME の変換キーも含めた入力したキーそのものを
 #   記録する。このため、キーボードマクロ記録時や再生時、IME の状態に留意した利用が必要。
+# ・kill-buffer に Ctl-x k とは別に M-k も割り当てている。プラウザのタブを削除する際
+#   などに利用可。
 #
 # ＜全てのアプリケーションソフトで共通の動き＞
 # ・other_window_key 変数に設定したキーにより、表示しているウィンドウの中で、一番最近
@@ -133,8 +135,11 @@ def configure(keymap):
     # （Keyhac のメニューから「内部ログ」を ON にすると processname や classname を確認することができます）
     not_emacs_target     = ["bash.exe",           # WSL
                             "ubuntu.exe",         # WSL
+                            "ubuntu1804.exe",     # WSL
                             "SLES-12.exe",        # WSL
                             "openSUSE-42.exe",    # WSL
+                            "debian.exe",         # WSL
+                            "kali.exe",           # WSL
                             "mintty.exe",         # mintty
                             "Cmder.exe",          # Cmder
                             "ConEmu.exe",         # ConEmu
@@ -162,8 +167,11 @@ def configure(keymap):
     # （指定できるアプリケーションソフトは、not_emacs_target で（除外）指定したものからのみとなります）
     ime_target           = ["bash.exe",           # WSL
                             "ubuntu.exe",         # WSL
+                            "ubuntu1804.exe",     # WSL
                             "SLES-12.exe",        # WSL
                             "openSUSE-42.exe",    # WSL
+                            "debian.exe",         # WSL
+                            "kali.exe",           # WSL
                             "mintty.exe",         # mintty
                             "Cmder.exe",          # Cmder
                             "ConEmu.exe",         # ConEmu
@@ -1161,6 +1169,7 @@ def configure(keymap):
     define_key(keymap_emacs, "Ctl-x k", reset_search(reset_undo(reset_counter(reset_mark(kill_buffer)))))
     define_key(keymap_emacs, "Ctl-x b", reset_search(reset_undo(reset_counter(reset_mark(switch_to_buffer)))))
     define_key(keymap_emacs, "Ctl-x o", reset_search(reset_undo(reset_counter(reset_mark(other_window)))))
+    define_key(keymap_emacs, "M-k",     reset_search(reset_undo(reset_counter(reset_mark(kill_buffer)))))
 
     ## 「文字列検索 / 置換」のキー設定
     define_key(keymap_emacs, "C-r",   reset_undo(reset_counter(reset_mark(isearch_backward))))
@@ -1375,8 +1384,8 @@ def configure(keymap):
 
         ## 「スクロール」のキー設定（上書きされないように最後に設定する）
         if scroll_key:
-            define_key(keymap_ei, scroll_key[0].replace("M-", "A-"), ei_record_func(scroll_up))
-            define_key(keymap_ei, scroll_key[1].replace("M-", "A-"), ei_record_func(scroll_down))
+            define_key(keymap_ei, scroll_key[0] and scroll_key[0].replace("M-", "A-"), ei_record_func(scroll_up))
+            define_key(keymap_ei, scroll_key[1] and scroll_key[1].replace("M-", "A-"), ei_record_func(scroll_down))
 
         ## emacs日本語入力モードを切り替える（トグルする）
         define_key(keymap_emacs, toggle_emacs_ime_mode_key, toggle_emacs_ime_mode)
@@ -1636,8 +1645,8 @@ def configure(keymap):
     define_key(keymap_lw, "A-n", next_line)
 
     if scroll_key:
-        define_key(keymap_lw, scroll_key[0].replace("M-", "A-"), scroll_up)
-        define_key(keymap_lw, scroll_key[1].replace("M-", "A-"), scroll_down)
+        define_key(keymap_lw, scroll_key[0] and scroll_key[0].replace("M-", "A-"), scroll_up)
+        define_key(keymap_lw, scroll_key[1] and scroll_key[1].replace("M-", "A-"), scroll_down)
 
     ## 「カット / コピー / 削除 / アンドゥ」のキー設定
     define_key(keymap_lw, "C-h", delete_backward_char)
