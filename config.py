@@ -2,7 +2,7 @@
 
 ##                               nickname: Fakeymacs
 ##
-## Windows の操作を emacs のキーバインドで行うための設定（Keyhac版）ver.20181121_01
+## Windows の操作を emacs のキーバインドで行うための設定（Keyhac版）ver.20190725_01
 ##
 
 # このスクリプトは、Keyhac for Windows ver 1.75 以降で動作します。
@@ -15,8 +15,8 @@
 # 本設定を利用するための仕様は、以下を参照してください。
 #
 # ＜共通の仕様＞
-# ・not_emacs_target 変数と ime_target 変数で、emacsキーバインドや IME の切り替えキーバインド
-#   の対象とするアプリケーションソフトを指定できる。
+# ・emacs_tareget_class 変数、not_emacs_target 変数、ime_target 変数で、emacsキーバインドや
+#   IME の切り替えキーバインドの対象とするアプリケーションソフトを指定できる。
 # ・not_clipboard_target 変数で、clipboard 監視の対象外とするアプリケーションソフトを指定
 #   できる。
 # ・日本語と英語のどちらのキーボードを利用するかを is_japanese_keyboard 変数で指定できる。
@@ -83,8 +83,8 @@
 # ・C-y を前置引数を指定して実行すると、ヤンク（ペースト）の繰り返しが行われる。
 # ・C-l は、アプリケーションソフト個別対応とする。recenter 関数で個別に指定すること。
 #   この設定では、Sakura Editor のみ対応している。
-# ・キーボードマクロは emacs の挙動と異なり、IME の変換キーも含めた入力したキーそのものを
-#   記録する。このため、キーボードマクロ記録時や再生時、IME の状態に留意した利用が必要。
+# ・キーボードマクロの再生時に IME の状態に依存した動作とならないようにするため、
+#   キーボードマクロの記録と再生の開始時に IME を強制的に OFF にするようにしている。
 # ・kill-buffer に Ctl-x k とは別に M-k も割り当てている。プラウザのタブを削除する際
 #   などに利用可。
 #
@@ -121,6 +121,7 @@ import time
 import sys
 import os.path
 import re
+import fnmatch
 
 import keyhac_keymap
 from keyhac import *
@@ -130,6 +131,9 @@ def configure(keymap):
     ####################################################################################################
     ## カスタマイズの設定
     ####################################################################################################
+
+    # emacs のキーバインドにするウィンドウのクラスネームを指定する（全ての設定に優先する）
+    emacs_target_class   = ["Edit"]               # テキスト入力フィールドなどが該当
 
     # emacs のキーバインドに“したくない”アプリケーションソフトを指定する
     # （Keyhac のメニューから「内部ログ」を ON にすると processname や classname を確認することができます）
@@ -253,8 +257,8 @@ def configure(keymap):
     # （切り替え画面が起動した後は、A-p、A-n でウィンドウを切り替えられるように設定している他、
     #   Alt + 矢印キーでもウィンドウを切り替えることができます。また、A-g もしくは A-Esc で切り替え画面の
     #   終了（キャンセル）となり、Altキーを離すか A-Enter で切り替えるウィンドウの確定となります。）
-    # window_switching_key = None # A-S-Tab、A-Tabキーのみを利用する
-    window_switching_key = [["A-p", "A-n"]]
+    # window_switching_key = [["A-p", "A-n"]]
+    window_switching_key = None # A-S-Tab、A-Tabキーのみを利用する
 
     # アクティブウィンドウをディスプレイ間で移動するキーの組み合わせ（前、後 の順）を指定する（複数指定可）
     # （other_window_key に割り当てている A-o との連係した利用を想定し、A-S-o も割り当てています）
@@ -326,6 +330,10 @@ def configure(keymap):
         if is_list_window(window):
             return False
 
+        if window.getClassName() in emacs_target_class:
+            fakeymacs.keybind = "emacs"
+            return True
+
         if window.getProcessName() in not_emacs_target:
             fakeymacs.keybind = "not_emacs"
             return False
@@ -334,8 +342,12 @@ def configure(keymap):
         return True
 
     def is_ime_target(window):
+        if window.getClassName() in emacs_target_class:
+            return False
+
         if window.getProcessName() in ime_target:
             return True
+
         return False
 
     if use_emacs_ime_mode:
@@ -393,7 +405,7 @@ def configure(keymap):
 
     def toggle_input_method():
         self_insert_command("A-(25)")()
-        delay(0.05)
+        delay(0.1)
 
         # IME の状態を格納する
         ime_status = keymap.getWindow().getImeStatus()
@@ -408,6 +420,8 @@ def configure(keymap):
 
             # IME の状態をバルーンヘルプで表示する
             keymap.popBalloon("ime_status", message, 500)
+
+        delay(0.1)
 
     def enable_input_method():
         keymap.wnd.setImeStatus(1)
@@ -477,7 +491,7 @@ def configure(keymap):
 
     def move_end_of_line():
         self_insert_command("End")()
-        if checkWindow("WINWORD.EXE$", "_WwG$"): # Microsoft Word
+        if checkWindow("WINWORD.EXE", "_WwG"): # Microsoft Word
             if fakeymacs.is_marked:
                 self_insert_command("Left")()
 
@@ -494,7 +508,8 @@ def configure(keymap):
         self_insert_command("PageDown")()
 
     def recenter():
-        if checkWindow("sakura.exe$", "EditorClient$|SakuraView166$"): # Sakura Editor
+        if (checkWindow("sakura.exe", "EditorClient") or # Sakura Editor
+            checkWindow("sakura.exe", "SakuraView166")): # Sakura Editor
             self_insert_command("C-h")()
 
     ##################################################
@@ -539,10 +554,11 @@ def configure(keymap):
             mark(move_end_of_line, True)()
             delay()
 
-            if checkWindow("cmd.exe$|powershell.exe$", "ConsoleWindowClass$"): # Cmd or PowerShell
+            if (checkWindow("cmd.exe", "ConsoleWindowClass") or       # Cmd
+                checkWindow("powershell.exe", "ConsoleWindowClass")): # PowerShell
                 kill_region()
 
-            elif checkWindow("Hidemaru.exe$", "HM32CLIENT$"): # Hidemaru Editor
+            elif checkWindow("Hidemaru.exe", "HM32CLIENT"): # Hidemaru Editor
                 kill_region()
                 delay()
                 if getClipboardText() == "":
@@ -553,7 +569,7 @@ def configure(keymap):
                 self_insert_command("Delete")()
         else:
             def move_end_of_region():
-                if checkWindow("WINWORD.EXE$", "_WwG$"): # Microsoft Word
+                if checkWindow("WINWORD.EXE", "_WwG"): # Microsoft Word
                     for i in range(repeat):
                         next_line()
                     move_beginning_of_line()
@@ -569,7 +585,7 @@ def configure(keymap):
 
     def kill_region():
         # コマンドプロンプトには Cut に対応するショートカットがない。その対策。
-        if checkWindow("cmd.exe$", "ConsoleWindowClass$"): # Cmd
+        if checkWindow("cmd.exe", "ConsoleWindowClass"): # Cmd
             copy()
 
             if fakeymacs.is_marked and fakeymacs.forward_direction is not None:
@@ -593,7 +609,7 @@ def configure(keymap):
 
     def undo():
         # redo（C-y）の機能を持っていないアプリケーションソフトは常に undo とする
-        if checkWindow("notepad.exe$", "Edit$"): # NotePad
+        if checkWindow("notepad.exe", "Edit"): # NotePad
             self_insert_command("C-z")()
         else:
             if fakeymacs.is_undo_mode:
@@ -610,17 +626,17 @@ def configure(keymap):
             fakeymacs.is_marked = True
 
     def mark_whole_buffer():
-        if checkWindow("cmd.exe$", "ConsoleWindowClass$"): # Cmd
+        if checkWindow("cmd.exe", "ConsoleWindowClass"): # Cmd
             # "Home", "C-a" では上手く動かない場合がある
             self_insert_command("Home", "S-End")()
             fakeymacs.forward_direction = True # 逆の設定にする
 
-        elif checkWindow("powershell.exe$", "ConsoleWindowClass$"): # PowerShell
+        elif checkWindow("powershell.exe", "ConsoleWindowClass"): # PowerShell
             self_insert_command("End", "S-Home")()
             fakeymacs.forward_direction = False
 
-        elif (checkWindow("EXCEL.EXE$", "EXCEL") or # Microsoft Excel
-              checkWindow(None, "Edit$")):          # NotePad 等
+        elif (checkWindow("EXCEL.EXE", "EXCEL*") or # Microsoft Excel
+              checkWindow(None, "Edit")):           # Edit クラス
             self_insert_command("C-End", "C-S-Home")()
             fakeymacs.forward_direction = False
         else:
@@ -657,12 +673,12 @@ def configure(keymap):
     ##################################################
 
     def isearch(direction):
-        if checkWindow("powershell.exe$", "ConsoleWindowClass$"): # PowerShell
+        if checkWindow("powershell.exe", "ConsoleWindowClass"): # PowerShell
             self_insert_command({"backward":"C-r", "forward":"C-s"}[direction])()
         else:
             if fakeymacs.is_searching:
-                if checkWindow("EXCEL.EXE$", None): # Microsoft Excel
-                    if checkWindow(None, "EDTBX$"): # 検索ウィンドウ
+                if checkWindow("EXCEL.EXE", None): # Microsoft Excel
+                    if checkWindow(None, "EDTBX"): # 検索ウィンドウ
                         self_insert_command({"backward":"A-S-f", "forward":"A-f"}[direction])()
                     else:
                         self_insert_command("C-f")()
@@ -679,8 +695,9 @@ def configure(keymap):
         isearch("forward")
 
     def query_replace():
-        if (checkWindow("sakura.exe$", "EditorClient$|SakuraView166$") or # Sakura Editor
-            checkWindow("Hidemaru.exe$", "HM32CLIENT$")):                 # Hidemaru Editor
+        if (checkWindow("sakura.exe", "EditorClient") or  # Sakura Editor
+            checkWindow("sakura.exe", "SakuraView166") or # Sakura Editor
+            checkWindow("Hidemaru.exe", "HM32CLIENT")):   # Hidemaru Editor
             self_insert_command("C-r")()
         else:
             self_insert_command("C-h")()
@@ -690,6 +707,8 @@ def configure(keymap):
     ##################################################
 
     def kmacro_start_macro():
+        if keymap.getWindow().getImeStatus():
+            toggle_input_method()
         keymap.command_RecordStart()
 
     def kmacro_end_macro():
@@ -717,9 +736,15 @@ def configure(keymap):
                        keymap.record_seq.append((ctl_x_prefix_vkey[0], True))
 
     def kmacro_end_and_call_macro():
-        fakeymacs.is_playing_kmacro = True
-        keymap.command_RecordPlay()
-        fakeymacs.is_playing_kmacro = False
+        def callKmacro():
+            delay()
+            fakeymacs.is_playing_kmacro = True
+            if keymap.getWindow().getImeStatus():
+                toggle_input_method()
+            keymap.command_RecordPlay()
+            fakeymacs.is_playing_kmacro = False
+
+        keymap.delayedCall(callKmacro, 0)
 
     ##################################################
     ## その他
@@ -737,10 +762,12 @@ def configure(keymap):
     def keyboard_quit():
         reset_region()
 
-        # Microsoft Excel または Evernote 以外の場合、Esc を発行する
-        if use_ctrl_g_as_esc:
-            if not (checkWindow("EXCEL.EXE$", "EXCEL") or checkWindow("Evernote.exe$", "WebViewHost$")):
-                self_insert_command("Esc")()
+        # Esc を発行して問題ないアプリケーションソフトには Esc を発行する
+        if not (checkWindow("cmd.exe", "ConsoleWindowClass") or        # Cmd
+                checkWindow("powershell.exe", "ConsoleWindowClass") or # PowerShell
+                checkWindow("EXCEL.EXE", "EXCEL*") or                  # Microsoft Excel
+                checkWindow("Evernote.exe", "WebViewHost")):           # Evernote
+            self_insert_command("Esc")()
 
         keymap.command_RecordStop()
 
@@ -810,9 +837,11 @@ def configure(keymap):
             if clipboard_text:
                 keymap.clipboard_history._push(clipboard_text)
 
-    def checkWindow(processName, className):
-        return ((processName is None or re.match(processName, keymap.getWindow().getProcessName())) and
-                (className is None or re.match(className, keymap.getWindow().getClassName())))
+    def checkWindow(processName, className, window=None):
+        if window == None:
+            window = keymap.getWindow()
+        return ((processName is None or fnmatch.fnmatch(window.getProcessName(), processName)) and
+                (className is None or fnmatch.fnmatch(window.getClassName(), className)))
 
     def vkeys():
         vkeys = list(keyCondition.vk_str_table.keys())
@@ -888,22 +917,22 @@ def configure(keymap):
     def reset_region():
         if use_region_reset and fakeymacs.is_marked and fakeymacs.forward_direction is not None:
 
-            if (checkWindow("sakura.exe$", "EditorClient$|SakuraView166$") or # Sakura Editor
-                checkWindow("Code.exe$", "Chrome_WidgetWin_1$") or            # Visual Studio Code
-                checkWindow("Hidemaru.exe$", "HM32CLIENT$")):                 # Hidemaru Editor
-                # 選択されているリージョンのハイライトを解除するために Esc キーを発行する
-                self_insert_command("Esc")()
+            if checkWindow(None, "Edit"): # Edit クラス
+                # 選択されているリージョンのハイライトを解除するためにカーソルキーを発行する
+                if fakeymacs.forward_direction:
+                    self_insert_command("Right")()
+                else:
+                    self_insert_command("Left")()
 
-            elif checkWindow("cmd.exe$", "ConsoleWindowClass$"): # Cmd
+            elif checkWindow("cmd.exe", "ConsoleWindowClass"): # Cmd
                 # 選択されているリージョンのハイライトを解除するためにカーソルを移動する
                 if fakeymacs.forward_direction:
                     self_insert_command("Right", "Left")()
                 else:
                     self_insert_command("Left", "Right")()
 
-            elif (checkWindow("powershell.exe$", "ConsoleWindowClass$") or # PowerShell
-                  checkWindow("EXCEL.EXE", None) or                        # Microsoft Excel
-                  checkWindow(None, "Edit$")):                             # NotePad 等
+            elif (checkWindow("powershell.exe", "ConsoleWindowClass") or # PowerShell
+                  checkWindow("EXCEL.EXE", None)):                       # Microsoft Excel
                 # 選択されているリージョンのハイライトを解除するためにカーソルを移動する
                 if fakeymacs.forward_direction:
                     self_insert_command("Left", "Right")()
@@ -1252,13 +1281,13 @@ def configure(keymap):
             fakeymacs.ei_last_func = None
             ei_popBalloon(toggle)
             if update:
-                keymap.updateKeymap()
+                ei_updateKeymap()
 
         def disable_emacs_ime_mode(update=True, toggle=False):
             fakeymacs.ei_last_window = None
             ei_popBalloon(toggle)
             if update:
-                keymap.updateKeymap()
+                ei_updateKeymap()
 
         def toggle_emacs_ime_mode():
             if fakeymacs.ei_last_window:
@@ -1321,6 +1350,12 @@ def configure(keymap):
                         else:
                             message = "[main]"
                         keymap.popBalloon("emacs_ime_mode", message, 500)
+
+        def ei_updateKeymap():
+            if fakeymacs.is_playing_kmacro:
+                keymap.updateKeymap()
+            else:
+                keymap.delayedCall(keymap.updateKeymap, 0)
 
         ##################################################
         ## キーバインド（emacs日本語入力モード用）
@@ -1436,7 +1471,7 @@ def configure(keymap):
                         # 操作の対象としたくないアプリケーションソフトの“プロセス名称”を、re.match 関数
                         # （先頭からのマッチ）の正規表現に「|」を使って繋げて指定してください。
                         # （完全マッチとするためには $ の指定が必要です。）
-                        if not re.match(r"RocketDock.exe$", process_name): # サンプルとして RocketDock.exe を登録
+                        if not re.match(r"RocketDock\.exe$", process_name): # サンプルとして RocketDock.exe を登録
 
                             # 表示されていないストアアプリ（「設定」等）が window_list に登録されるのを抑制する
                             if class_name == "Windows.UI.Core.CoreWindow":
@@ -1485,9 +1520,11 @@ def configure(keymap):
 
     def restore_window():
         window_list = getWindowList()
-        if not (sys.getwindowsversion().major == 6 and
-                sys.getwindowsversion().minor == 1):
-            window_list.reverse()
+
+        # ウィンドウのリストアが最小化した順番の逆順にならないときは以下を無効化
+        # （コメント化）してください
+        window_list.reverse()
+
         for wnd in window_list:
             if wnd.isMinimized():
                 wnd.restore()
@@ -1781,6 +1818,7 @@ def configure(keymap):
                     ["Facebook",        keymap.ShellExecuteCommand(None, r"https://www.facebook.com/", "", "")],
                     ["Twitter",         keymap.ShellExecuteCommand(None, r"https://twitter.com/", "", "")],
                     ["Keyhac",          keymap.ShellExecuteCommand(None, r"https://sites.google.com/site/craftware/keyhac-ja", "", "")],
+                    ["Fakeymacs",       keymap.ShellExecuteCommand(None, r"https://github.com/smzht/fakeymacs", "", "")],
                     ["NTEmacs＠ウィキ", keymap.ShellExecuteCommand(None, r"http://www49.atwiki.jp/ntemacs/", "", "")],
                 ]
                 website_items[0][0] = list_formatter.format(website_items[0][0])
@@ -1819,13 +1857,21 @@ def configure(keymap):
 
 
     ####################################################################################################
-    ## Excel の場合、C-Enter に F2（セル編集モード移行）を割り当てる（オプション）
+    ## C-Enter に F2（編集モード移行）を割り当てる（オプション）
     ####################################################################################################
     if 1:
-        keymap_excel = keymap.defineWindowKeymap(class_name="EXCEL*")
+        edit_mode_target = [["EXCEL.EXE",    "EXCEL*"],
+                            ["explorer.exe", "DirectUIHWND"]]
 
-        # C-Enter 押下で、「セル編集モード」に移行する
-        define_key(keymap_excel, "C-Enter", reset_search(reset_undo(reset_counter(reset_mark(self_insert_command("F2"))))))
+        def is_edit_mode_target(window):
+            for processName, className in edit_mode_target:
+                if checkWindow(processName, className, window):
+                    return True
+            return False
+
+        keymap_edit_mode = keymap.defineWindowKeymap(check_func=is_edit_mode_target)
+
+        define_key(keymap_edit_mode, "C-Enter", reset_search(reset_undo(reset_counter(reset_mark(self_insert_command("F2"))))))
 
 
     ####################################################################################################
