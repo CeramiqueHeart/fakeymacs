@@ -2,7 +2,7 @@
 
 ##                             nickname: Fakeymacs Light
 ##
-## Windows の操作を Emacs のキーバインドで行うための設定 Light（Keyhac版）ver.20200109_01
+## Windows の操作を emacs のキーバインドで行うための設定 Light（Keyhac版）ver.20190721_02
 ##
 
 # このスクリプトは、Keyhac for Windows ver 1.75 以降で動作します。
@@ -15,32 +15,32 @@
 # 本設定を利用するための仕様は、以下を参照してください。
 #
 # ＜共通の仕様＞
-# ・emacs_tareget_class 変数、not_emacs_target 変数、ime_target 変数で、Emacsキーバインドや
+# ・emacs_tareget_class 変数、not_emacs_target 変数、ime_target 変数で、emacsキーバインドや
 #   IME の切り替えキーバインドの対象とするアプリケーションソフトを指定できる。
 # ・not_clipboard_target 変数で、clipboard 監視の対象外とするアプリケーションソフトを指定
 #   できる。
 # ・日本語と英語のどちらのキーボードを利用するかを is_japanese_keyboard 変数で指定できる。
 # ・左右どちらの Ctrlキーを使うかを side_of_ctrl_key 変数で指定できる。
 # ・左右どちらの Altキーを使うかを side_of_alt_key 変数で指定できる。
-# ・キーバインドの定義では次の表記が利用できる。
+# ・キーバインドの定義では以下の表記が利用できる。
 #   ・S-    : Shiftキー
 #   ・C-    : Ctrlキー
 #   ・A-    : Altキー
 #   ・M-    : Altキー と Esc、C-[ のプレフィックスキーを利用する３パターンを定義
-#             （Emacsキーバインド設定で利用可。emacs の Meta と同様の意味。）
+#             （emacsキーバインド設定で利用可。emacs の Meta と同様の意味。）
 #   ・Ctl-x : ctl_x_prefix_key 変数で定義されているプレフィックスキーに置換え
-#             （Emacsキーバインド設定で利用可。変数の意味は以下を参照のこと。）
+#             （emacsキーバインド設定で利用可。変数の意味は以下を参照のこと。）
 #   ・(999) : 仮想キーコード指定
 #
-# ＜Emacsキーバインド設定と IME の切り替え設定を有効にしたアプリケーションソフトでの動き＞
+# ＜emacsキーバインド設定と IME の切り替え設定を有効にしたアプリケーションソフトでの動き＞
 # ・toggle_input_method_key 変数の設定により、IME を切り替えるキーを指定できる。
-# ・use_emacs_ime_mode 変数の設定により、Emacs日本語入力モードを使うかどうかを指定
-#   できる。Emacs日本語入力モードは、IME が ON の時に文字（英数字かスペースを除く
+# ・use_emacs_ime_mode 変数の設定により、emacs日本語入力モードを使うかどうかを指定
+#   できる。emacs日本語入力モードは、IME が ON の時に文字（英数字かスペースを除く
 #   特殊文字）を入力すると起動する。
-#   Emacs日本語入力モードでは、次のキーのみが Emacsキーバインドとして利用でき、
+#   emacs日本語入力モードでは、以下のキーのみが emacsキーバインドとして利用でき、
 #   その他のキーは Windows にそのまま渡されるようになるため、IME のショートカットキー
 #   として利用することができる。
-#   ・Emacs日本語入力モードで使える Emacsキーバインドキー
+#   ・emacs日本語入力モードで使える emacsキーバインドキー
 #     ・C-[
 #     ・C-b、C-f
 #     ・C-p、C-n
@@ -51,17 +51,17 @@
 #     ・C-g
 #     ・scroll_key 変数で指定したスクロールキー
 #     ・toggle_emacs_ime_mode_key 変数で指定したキー
-#      （Emacsキーバインド用のキーではないが、Emacs日本語入力モードを切り替えるキー）
-#   Emacs日本語入力モードは、次の操作で終了する。
+#      （emacsキーバインド用のキーではないが、emacs日本語入力モードを切り替えるキー）
+#   emacs日本語入力モードは、以下の操作で終了する。
 #   ・Enter、C-m または C-g が押された場合
 #   ・[半角／全角] キー、A-` キーが押された場合
 #   ・BS、C-h 押下直後に toggle_input_method_key 変数で指定したキーが押された場合
 #     （間違って日本語入力をしてしまった時のキー操作を想定しての対策）
 #   ・toggle_emacs_ime_mode_key 変数で指定したキーが押された場合
-# ・Emacs日本語入力モードの使用を有効にした際、emacs_ime_mode_balloon_message 変数の
+# ・emacs日本語入力モードの使用を有効にした際、emacs_ime_mode_balloon_message 変数の
 #   設定でバルーンメッセージとして表示する文字列を指定できる。
 #
-# ＜Emacsキーバインド設定を有効にしたアプリケーションソフトでの動き＞
+# ＜emacsキーバインド設定を有効にしたアプリケーションソフトでの動き＞
 # ・use_ctrl_i_as_tab 変数の設定により、C-iキーを Tabキーとして使うかどうかを指定できる。
 # ・use_esc_as_meta 変数の設定より、Escキーを Metaキーとして使うかどうかを指定できる。
 #   use_esc_as_meta 変数が True（Metaキーとして使う）に設定されている場合、ESC の
@@ -102,69 +102,63 @@ def configure(keymap):
     ## カスタマイズの設定
     ####################################################################################################
 
-    # Emacs のキーバインドにするウィンドウのクラスネームを指定する（全ての設定に優先する）
-    emacs_target_class   = ["Edit"]                # テキスト入力フィールドなどが該当
+    # emacs のキーバインドにするウィンドウのクラスネームを指定する（全ての設定に優先する）
+    emacs_target_class   = ["Edit"]               # テキスト入力フィールドなどが該当
 
-    # Emacs のキーバインドに“したくない”アプリケーションソフトを指定する
+    # emacs のキーバインドに“したくない”アプリケーションソフトを指定する
     # （Keyhac のメニューから「内部ログ」を ON にすると processname や classname を確認することができます）
-    not_emacs_target     = ["bash.exe",               # WSL
-                            "ubuntu.exe",             # WSL
-                            "ubuntu1604.exe",         # WSL
-                            "ubuntu1804.exe",         # WSL
-                            "debian.exe",             # WSL
-                            "kali.exe",               # WSL
-                            "SLES-12.exe",            # WSL
-                            "openSUSE-42.exe",        # WSL
-                            "openSUSE-Leap-15-1.exe", # WSL
-                            "mstsc.exe",              # Remote Desktop
-                            "WindowsTerminal.exe",    # Windows Terminal
-                            "mintty.exe",             # mintty
-                            "Cmder.exe",              # Cmder
-                            "ConEmu.exe",             # ConEmu
-                            "ConEmu64.exe",           # ConEmu
-                            "emacs.exe",              # Emacs
-                            "emacs-X11.exe",          # Emacs
-                            "emacs-w32.exe",          # Emacs
-                            "gvim.exe",               # GVim
-                            "Code.exe",               # VSCode
-                            "xyzzy.exe",              # xyzzy
-                            "VirtualBox.exe",         # VirtualBox
-                            "XWin.exe",               # Cygwin/X
-                            "XWin_MobaX.exe",         # MobaXterm/X
-                            "Xming.exe",              # Xming
-                            "vcxsrv.exe",             # VcXsrv
-                            "X410.exe",               # X410
-                            "putty.exe",              # PuTTY
-                            "ttermpro.exe",           # TeraTerm
-                            "MobaXterm.exe",          # MobaXterm
-                            "TurboVNC.exe",           # TurboVNC
-                            "vncviewer.exe"]          # UltraVNC
+    not_emacs_target     = ["bash.exe",           # WSL
+                            "ubuntu.exe",         # WSL
+                            "ubuntu1604.exe",     # WSL
+                            "ubuntu1804.exe",     # WSL
+                            "SLES-12.exe",        # WSL
+                            "openSUSE-42.exe",    # WSL
+                            "debian.exe",         # WSL
+                            "kali.exe",           # WSL
+                            "mintty.exe",         # mintty
+                            "Cmder.exe",          # Cmder
+                            "ConEmu.exe",         # ConEmu
+                            "ConEmu64.exe",       # ConEmu
+                            "emacs.exe",          # Emacs
+                            "emacs-X11.exe",      # Emacs
+                            "emacs-w32.exe",      # Emacs
+                            "gvim.exe",           # GVim
+                            "Code.exe",           # VSCode
+                            "xyzzy.exe",          # xyzzy
+                            "VirtualBox.exe",     # VirtualBox
+                            "XWin.exe",           # Cygwin/X
+                            "XWin_MobaX.exe",     # MobaXterm/X
+                            "Xming.exe",          # Xming
+                            "vcxsrv.exe",         # VcXsrv
+                            "putty.exe",          # PuTTY
+                            "ttermpro.exe",       # TeraTerm
+                            "MobaXterm.exe",      # MobaXterm
+                            "TurboVNC.exe",       # TurboVNC
+                            "vncviewer.exe"]      # UltraVNC
 
     # IME の切り替え“のみをしたい”アプリケーションソフトを指定する
     # （指定できるアプリケーションソフトは、not_emacs_target で（除外）指定したものからのみとなります）
-    ime_target           = ["bash.exe",               # WSL
-                            "ubuntu.exe",             # WSL
-                            "ubuntu1604.exe",         # WSL
-                            "ubuntu1804.exe",         # WSL
-                            "debian.exe",             # WSL
-                            "kali.exe",               # WSL
-                            "SLES-12.exe",            # WSL
-                            "openSUSE-42.exe",        # WSL
-                            "openSUSE-Leap-15-1.exe", # WSL
-                            "WindowsTerminal.exe",    # Windows Terminal
-                            "mintty.exe",             # mintty
-                            "Cmder.exe",              # Cmder
-                            "ConEmu.exe",             # ConEmu
-                            "ConEmu64.exe",           # ConEmu
-                            "gvim.exe",               # GVim
-                            "Code.exe",               # VSCode
-                            "xyzzy.exe",              # xyzzy
-                            "putty.exe",              # PuTTY
-                            "ttermpro.exe",           # TeraTerm
-                            "MobaXterm.exe"]          # MobaXterm
+    ime_target           = ["bash.exe",           # WSL
+                            "ubuntu.exe",         # WSL
+                            "ubuntu1604.exe",     # WSL
+                            "ubuntu1804.exe",     # WSL
+                            "SLES-12.exe",        # WSL
+                            "openSUSE-42.exe",    # WSL
+                            "debian.exe",         # WSL
+                            "kali.exe",           # WSL
+                            "mintty.exe",         # mintty
+                            "Cmder.exe",          # Cmder
+                            "ConEmu.exe",         # ConEmu
+                            "ConEmu64.exe",       # ConEmu
+                            "gvim.exe",           # GVim
+                            "Code.exe",           # VSCode
+                            "xyzzy.exe",          # xyzzy
+                            "putty.exe",          # PuTTY
+                            "ttermpro.exe",       # TeraTerm
+                            "MobaXterm.exe"]      # MobaXterm
 
     # clipboard 監視の対象外とするアプリケーションソフトを指定する
-    not_clipboard_target = ["EXCEL.EXE"]              # Excel
+    not_clipboard_target = ["EXCEL.EXE"]          # Excel
 
     # 日本語キーボードかどうかを指定する（True: 日本語キーボード、False: 英語キーボード）
     is_japanese_keyboard = True
@@ -175,14 +169,18 @@ def configure(keymap):
     # 左右どちらの Altキーを使うかを指定する（"L": 左、"R": 右）
     side_of_alt_key = "L"
 
-    # Emacs日本語入力モードを使うかどうかを指定する（True: 使う、False: 使わない）
+    # リージョンのコピー後にリージョンを解除する機能を使うかどうかを指定する（True: 使う、False: 使わない）
+    # （リージョンを解除する機能は、リージョンをキーボードで指定した場合のみ利用可能です）
+    use_region_reset = True
+
+    # emacs日本語入力モードを使うかどうかを指定する（True: 使う、False: 使わない）
     use_emacs_ime_mode = True
 
-    # Emacs日本語入力モードを切り替える（トグルする）キーを指定する
+    # emacs日本語入力モードを切り替える（トグルする）キーを指定する
     # toggle_emacs_ime_mode_key = None
     toggle_emacs_ime_mode_key = "C-t"
 
-    # Emacs日本語入力モードが有効なときに表示するバルーンメッセージを指定する
+    # emacs日本語入力モードが有効なときに表示するバルーンメッセージを指定する
     # emacs_ime_mode_balloon_message = None
     emacs_ime_mode_balloon_message = "▲"
 
@@ -484,7 +482,7 @@ def configure(keymap):
         if checkWindow("cmd.exe", "ConsoleWindowClass"): # Cmd
             copy()
 
-            if fakeymacs.forward_direction is not None:
+            if fakeymacs.is_marked and fakeymacs.forward_direction is not None:
                 if fakeymacs.forward_direction:
                     key = "Delete"
                 else:
@@ -514,7 +512,7 @@ def configure(keymap):
                 self_insert_command("C-y")()
 
     def set_mark_command():
-        if fakeymacs.is_marked or fakeymacs.forward_direction is not None:
+        if fakeymacs.is_marked:
             reset_region()
             fakeymacs.is_marked = False
             fakeymacs.forward_direction = None
@@ -790,7 +788,7 @@ def configure(keymap):
         return _func
 
     def reset_region():
-        if fakeymacs.forward_direction is not None:
+        if use_region_reset and fakeymacs.is_marked and fakeymacs.forward_direction is not None:
 
             if checkWindow(None, "Edit"): # Edit クラス
                 # 選択されているリージョンのハイライトを解除するためにカーソルキーを発行する
@@ -833,18 +831,7 @@ def configure(keymap):
                 if fakeymacs.forward_direction is None:
                     fakeymacs.forward_direction = forward_direction
             else:
-                fakeymacs.forward_direction = None
                 func()
-        return _func
-
-    def mark2(func, forward_direction):
-        def _func():
-            if fakeymacs.is_marked:
-                reset_region()
-                fakeymacs.forward_direction = None
-            fakeymacs.is_marked = True
-            mark(func, forward_direction)()
-            fakeymacs.is_marked = False
         return _func
 
     def reset_mark(func):
@@ -911,7 +898,7 @@ def configure(keymap):
     ## キーバインド
     ##################################################
 
-    # キーバインドの定義に利用している表記の意味は次のとおりです。
+    # キーバインドの定義に利用している表記の意味は以下のとおりです。
     # ・S-    : Shiftキー
     # ・C-    : Ctrlキー
     # ・A-    : Altキー
@@ -1015,15 +1002,6 @@ def configure(keymap):
     define_key(keymap_emacs, "M-S-Period", reset_search(reset_undo(reset_counter(mark(end_of_buffer, True)))))
     define_key(keymap_emacs, "C-l",        reset_search(reset_undo(reset_counter(recenter))))
 
-    define_key(keymap_emacs, "C-S-b", reset_search(reset_undo(reset_counter(mark2(repeat(backward_char), False)))))
-    define_key(keymap_emacs, "C-S-f", reset_search(reset_undo(reset_counter(mark2(repeat(forward_char), True)))))
-    define_key(keymap_emacs, "M-S-b", reset_search(reset_undo(reset_counter(mark2(repeat(backward_word), False)))))
-    define_key(keymap_emacs, "M-S-f", reset_search(reset_undo(reset_counter(mark2(repeat(forward_word), True)))))
-    define_key(keymap_emacs, "C-S-p", reset_search(reset_undo(reset_counter(mark2(repeat(previous_line), False)))))
-    define_key(keymap_emacs, "C-S-n", reset_search(reset_undo(reset_counter(mark2(repeat(next_line), True)))))
-    define_key(keymap_emacs, "C-S-a", reset_search(reset_undo(reset_counter(mark2(move_beginning_of_line, False)))))
-    define_key(keymap_emacs, "C-S-e", reset_search(reset_undo(reset_counter(mark2(move_end_of_line, True)))))
-
     define_key(keymap_emacs, "Left",     reset_search(reset_undo(reset_counter(mark(repeat(backward_char), False)))))
     define_key(keymap_emacs, "Right",    reset_search(reset_undo(reset_counter(mark(repeat(forward_char), True)))))
     define_key(keymap_emacs, "C-Left",   reset_search(reset_undo(reset_counter(mark(repeat(backward_word), False)))))
@@ -1036,19 +1014,6 @@ def configure(keymap):
     define_key(keymap_emacs, "C-End",    reset_search(reset_undo(reset_counter(mark(end_of_buffer, True)))))
     define_key(keymap_emacs, "PageUP",   reset_search(reset_undo(reset_counter(mark(scroll_up, False)))))
     define_key(keymap_emacs, "PageDown", reset_search(reset_undo(reset_counter(mark(scroll_down, True)))))
-
-    define_key(keymap_emacs, "S-Left",     reset_search(reset_undo(reset_counter(mark2(repeat(backward_char), False)))))
-    define_key(keymap_emacs, "S-Right",    reset_search(reset_undo(reset_counter(mark2(repeat(forward_char), True)))))
-    define_key(keymap_emacs, "C-S-Left",   reset_search(reset_undo(reset_counter(mark2(repeat(backward_word), False)))))
-    define_key(keymap_emacs, "C-S-Right",  reset_search(reset_undo(reset_counter(mark2(repeat(forward_word), True)))))
-    define_key(keymap_emacs, "S-Up",       reset_search(reset_undo(reset_counter(mark2(repeat(previous_line), False)))))
-    define_key(keymap_emacs, "S-Down",     reset_search(reset_undo(reset_counter(mark2(repeat(next_line), True)))))
-    define_key(keymap_emacs, "S-Home",     reset_search(reset_undo(reset_counter(mark2(move_beginning_of_line, False)))))
-    define_key(keymap_emacs, "S-End",      reset_search(reset_undo(reset_counter(mark2(move_end_of_line, True)))))
-    define_key(keymap_emacs, "C-S-Home",   reset_search(reset_undo(reset_counter(mark2(beginning_of_buffer, False)))))
-    define_key(keymap_emacs, "C-S-End",    reset_search(reset_undo(reset_counter(mark2(end_of_buffer, True)))))
-    define_key(keymap_emacs, "S-PageUP",   reset_search(reset_undo(reset_counter(mark2(scroll_up, False)))))
-    define_key(keymap_emacs, "S-PageDown", reset_search(reset_undo(reset_counter(mark2(scroll_down, True)))))
 
     ## 「カット / コピー / 削除 / アンドゥ」のキー設定
     define_key(keymap_emacs, "C-h",      reset_search(reset_undo(reset_counter(reset_mark(repeat2(delete_backward_char))))))
@@ -1066,7 +1031,7 @@ def configure(keymap):
     define_key(keymap_emacs, "Delete",   reset_search(reset_undo(reset_counter(reset_mark(repeat2(delete_char))))))
     define_key(keymap_emacs, "C-Back",   reset_search(reset_undo(reset_counter(reset_mark(repeat3(backward_kill_word))))))
     define_key(keymap_emacs, "C-Delete", reset_search(reset_undo(reset_counter(reset_mark(repeat3(kill_word))))))
-    define_key(keymap_emacs, "C-c",      reset_search(reset_undo(reset_counter(reset_mark(kill_ring_save)))))
+    define_key(keymap_emacs, "C-c",      reset_search(reset_undo(reset_counter(reset_mark(copy)))))
     define_key(keymap_emacs, "C-v",      reset_search(reset_undo(reset_counter(reset_mark(repeat(yank)))))) # scroll_key の設定で上書きされない場合
     define_key(keymap_emacs, "C-z",      reset_search(reset_counter(reset_mark(undo))))
 
@@ -1136,7 +1101,7 @@ def configure(keymap):
 
 
     ####################################################################################################
-    ## Emacs日本語入力モードの設定
+    ## emacs日本語入力モードの設定
     ####################################################################################################
     if use_emacs_ime_mode:
 
@@ -1157,11 +1122,11 @@ def configure(keymap):
         # IME の状態を格納する
         fakeymacs.ei_ime_status = False
 
-        # Emacs日本語入力モードが開始されたときのウィンドウオブジェクトを格納する変数を初期化する
+        # emacs日本語入力モードが開始されたときのウィンドウオブジェクトを格納する変数を初期化する
         fakeymacs.ei_last_window = None
 
         ##################################################
-        ## Emacs日本語入力モード の切り替え
+        ## emacs日本語入力モード の切り替え
         ##################################################
 
         def enable_emacs_ime_mode(update=True, toggle=False):
@@ -1184,7 +1149,7 @@ def configure(keymap):
                 enable_emacs_ime_mode(toggle=True)
 
         ##################################################
-        ## IME の切り替え（Emacs日本語入力モード用）
+        ## IME の切り替え（emacs日本語入力モード用）
         ##################################################
 
         def ei_toggle_input_method():
@@ -1200,7 +1165,7 @@ def configure(keymap):
             return _func
 
         ##################################################
-        ## その他（Emacs日本語入力モード用）
+        ## その他（emacs日本語入力モード用）
         ##################################################
 
         def ei_esc():
@@ -1215,7 +1180,7 @@ def configure(keymap):
             disable_emacs_ime_mode()
 
         ##################################################
-        ## 共通関数（Emacs日本語入力モード用）
+        ## 共通関数（emacs日本語入力モード用）
         ##################################################
 
         def ei_record_func(func):
@@ -1246,7 +1211,7 @@ def configure(keymap):
                 keymap.delayedCall(keymap.updateKeymap, 0)
 
         ##################################################
-        ## キーバインド（Emacs日本語入力モード用）
+        ## キーバインド（emacs日本語入力モード用）
         ##################################################
 
         ## 全てキーパターンの設定（ei_record_func 関数を通すための設定）
@@ -1307,7 +1272,7 @@ def configure(keymap):
             define_key(keymap_ei, scroll_key[0] and scroll_key[0].replace("M-", "A-"), ei_record_func(scroll_up))
             define_key(keymap_ei, scroll_key[1] and scroll_key[1].replace("M-", "A-"), ei_record_func(scroll_down))
 
-        ## Emacs日本語入力モードを切り替える（トグルする）
+        ## emacs日本語入力モードを切り替える（トグルする）
         define_key(keymap_emacs, toggle_emacs_ime_mode_key, toggle_emacs_ime_mode)
         define_key(keymap_ime,   toggle_emacs_ime_mode_key, toggle_emacs_ime_mode)
         define_key(keymap_ei,    toggle_emacs_ime_mode_key, toggle_emacs_ime_mode)
