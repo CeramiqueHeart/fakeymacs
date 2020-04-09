@@ -2,7 +2,7 @@
 
 ##                             nickname: Fakeymacs Light
 ##
-## Windows の操作を Emacs のキーバインドで行うための設定 Light（Keyhac版）ver.20200109_01
+## Windows の操作を Emacs のキーバインドで行うための設定 Light（Keyhac版）ver.20200317_01
 ##
 
 # このスクリプトは、Keyhac for Windows ver 1.75 以降で動作します。
@@ -103,7 +103,7 @@ def configure(keymap):
     ####################################################################################################
 
     # Emacs のキーバインドにするウィンドウのクラスネームを指定する（全ての設定に優先する）
-    emacs_target_class   = ["Edit"]                # テキスト入力フィールドなどが該当
+    emacs_target_class   = ["Edit"]                   # テキスト入力フィールドなどが該当
 
     # Emacs のキーバインドに“したくない”アプリケーションソフトを指定する
     # （Keyhac のメニューから「内部ログ」を ON にすると processname や classname を確認することができます）
@@ -138,7 +138,9 @@ def configure(keymap):
                             "ttermpro.exe",           # TeraTerm
                             "MobaXterm.exe",          # MobaXterm
                             "TurboVNC.exe",           # TurboVNC
-                            "vncviewer.exe"]          # UltraVNC
+                            "vncviewer.exe",          # UltraVNC
+                            "vncviewer64.exe",        # UltraVNC
+                           ]
 
     # IME の切り替え“のみをしたい”アプリケーションソフトを指定する
     # （指定できるアプリケーションソフトは、not_emacs_target で（除外）指定したものからのみとなります）
@@ -161,7 +163,8 @@ def configure(keymap):
                             "xyzzy.exe",              # xyzzy
                             "putty.exe",              # PuTTY
                             "ttermpro.exe",           # TeraTerm
-                            "MobaXterm.exe"]          # MobaXterm
+                            "MobaXterm.exe",          # MobaXterm
+                           ]
 
     # clipboard 監視の対象外とするアプリケーションソフトを指定する
     not_clipboard_target = ["EXCEL.EXE"]              # Excel
@@ -223,6 +226,11 @@ def configure(keymap):
 
     # コマンドのリピート回数の最大値を指定する
     repeat_max = 1024
+
+    # Microsoft Excel のセル内で改行を選択可能かを指定する（True: 選択可、False: 選択不可）
+    # （kill_line 関数の挙動を変えるための変数です。Microsoft Excel 2019 以降では True にして
+    #   ください。）
+    is_newline_selectable_in_Excel = False
 
 
     ####################################################################################################
@@ -387,7 +395,10 @@ def configure(keymap):
 
     def move_end_of_line():
         self_insert_command("End")()
-        if checkWindow("WINWORD.EXE", "_WwG"): # Microsoft Word
+        if (checkWindow("WINWORD.EXE", "_WwG") or      # Microsoft Word
+            checkWindow("POWERPNT.EXE", "mdiClass") or # Microsoft PowerPoint
+            (checkWindow("EXCEL.EXE", "EXCEL*") and    # Microsoft Excel
+             is_newline_selectable_in_Excel)):
             if fakeymacs.is_marked:
                 self_insert_command("Left")()
 
@@ -454,7 +465,7 @@ def configure(keymap):
                 checkWindow("powershell.exe", "ConsoleWindowClass")): # PowerShell
                 kill_region()
 
-            elif checkWindow("Hidemaru.exe", "HM32CLIENT"): # Hidemaru Editor
+            elif checkWindow(None, "HM32CLIENT"): # Hidemaru Software
                 kill_region()
                 delay()
                 if getClipboardText() == "":
@@ -586,7 +597,7 @@ def configure(keymap):
     def query_replace():
         if (checkWindow("sakura.exe", "EditorClient") or  # Sakura Editor
             checkWindow("sakura.exe", "SakuraView166") or # Sakura Editor
-            checkWindow("Hidemaru.exe", "HM32CLIENT")):   # Hidemaru Editor
+            checkWindow(None, "HM32CLIENT")):             # Hidemaru Software
             self_insert_command("C-r")()
         else:
             self_insert_command("C-h")()

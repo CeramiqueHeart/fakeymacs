@@ -2,7 +2,7 @@
 
 ##                               nickname: Fakeymacs
 ##
-## Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）ver.20200109_01
+## Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）ver.20200317_01
 ##
 
 # このスクリプトは、Keyhac for Windows ver 1.75 以降で動作します。
@@ -133,7 +133,7 @@ def configure(keymap):
     ####################################################################################################
 
     # Emacs のキーバインドにするウィンドウのクラスネームを指定する（全ての設定に優先する）
-    emacs_target_class   = ["Edit"]                # テキスト入力フィールドなどが該当
+    emacs_target_class   = ["Edit"]                   # テキスト入力フィールドなどが該当
 
     # Emacs のキーバインドに“したくない”アプリケーションソフトを指定する
     # （Keyhac のメニューから「内部ログ」を ON にすると processname や classname を確認することができます）
@@ -169,9 +169,11 @@ def configure(keymap):
                             "MobaXterm.exe",          # MobaXterm
                             "TurboVNC.exe",           # TurboVNC
                             "vncviewer.exe",          # UltraVNC
+                            "vncviewer64.exe",        # UltraVNC
                             "Poderosa.exe",           # Poderosa
                             "RLogin.exe",             # RLogin
-                            "mstsc.exe"]              # Remote Desktop
+                            "mstsc.exe"               # Remote Desktop
+                           ]
 
     # IME の切り替え“のみをしたい”アプリケーションソフトを指定する
     # （指定できるアプリケーションソフトは、not_emacs_target で（除外）指定したものからのみとなります）
@@ -196,7 +198,8 @@ def configure(keymap):
                             "ttermpro.exe",           # TeraTerm
                             "MobaXterm.exe",          # MobaXterm
                             "Poderosa.exe",           # Poderosa
-                            "RLogin.exe"]             # RLogin
+                            "RLogin.exe"              # RLogin
+                           ]
 
     # clipboard 監視の対象外とするアプリケーションソフトを指定する
     not_clipboard_target = ["EXCEL.EXE"]              # Excel
@@ -298,11 +301,11 @@ def configure(keymap):
     # コマンドのリピート回数の最大値を指定する
     repeat_max = 1024
 
-    # C-[数字] 等のコマンドを有効にするかどうかを指定する（True: 使う、False: 使わない）
-    use_digit_key = False
+    # Microsoft Excel のセル内で改行を選択可能かを指定する（True: 選択可、False: 選択不可）
+    # （kill_line 関数の挙動を変えるための変数です。Microsoft Excel 2019 以降では True にして
+    #   ください。）
+    is_newline_selectable_in_Excel = False
 
-    # C-g でアプリケーションに対して ESC を発行するかどうかを指定する (True: 発行する、False: 発行しない)
-    use_ctrl_g_as_esc = False
 
     ####################################################################################################
     ## 基本設定
@@ -495,7 +498,10 @@ def configure(keymap):
 
     def move_end_of_line():
         self_insert_command("End")()
-        if checkWindow("WINWORD.EXE", "_WwG"): # Microsoft Word
+        if (checkWindow("WINWORD.EXE", "_WwG") or      # Microsoft Word
+            checkWindow("POWERPNT.EXE", "mdiClass") or # Microsoft PowerPoint
+            (checkWindow("EXCEL.EXE", "EXCEL*") and    # Microsoft Excel
+             is_newline_selectable_in_Excel)):
             if fakeymacs.is_marked:
                 self_insert_command("Left")()
 
@@ -562,7 +568,7 @@ def configure(keymap):
                 checkWindow("powershell.exe", "ConsoleWindowClass")): # PowerShell
                 kill_region()
 
-            elif checkWindow("Hidemaru.exe", "HM32CLIENT"): # Hidemaru Editor
+            elif checkWindow(None, "HM32CLIENT"): # Hidemaru Software
                 kill_region()
                 delay()
                 if getClipboardText() == "":
@@ -701,7 +707,7 @@ def configure(keymap):
     def query_replace():
         if (checkWindow("sakura.exe", "EditorClient") or  # Sakura Editor
             checkWindow("sakura.exe", "SakuraView166") or # Sakura Editor
-            checkWindow("Hidemaru.exe", "HM32CLIENT")):   # Hidemaru Editor
+            checkWindow(None, "HM32CLIENT")):             # Hidemaru Software
             self_insert_command("C-r")()
         else:
             self_insert_command("C-h")()
@@ -1063,15 +1069,14 @@ def configure(keymap):
         define_key(keymap_emacs, "Esc", keymap.defineMultiStrokeKeymap("Esc"))
 
     ## 数字キーの設定
-    if use_digit_key:
-        for key in range(10):
-            s_key = str(key)
-            define_key(keymap_emacs,        s_key, digit(key))
-            define_key(keymap_emacs, "C-" + s_key, digit2(key))
-            define_key(keymap_emacs, "M-" + s_key, digit2(key))
-            define_key(keymap_emacs, "S-" + s_key, reset_undo(reset_counter(reset_mark(repeat(self_insert_command2("S-" + s_key))))))
-            define_key(keymap_ime,          s_key, self_insert_command2(       s_key))
-            define_key(keymap_ime,   "S-" + s_key, self_insert_command2("S-" + s_key))
+    for key in range(10):
+        s_key = str(key)
+        define_key(keymap_emacs,        s_key, digit(key))
+        define_key(keymap_emacs, "C-" + s_key, digit2(key))
+        define_key(keymap_emacs, "M-" + s_key, digit2(key))
+        define_key(keymap_emacs, "S-" + s_key, reset_undo(reset_counter(reset_mark(repeat(self_insert_command2("S-" + s_key))))))
+        define_key(keymap_ime,          s_key, self_insert_command2(       s_key))
+        define_key(keymap_ime,   "S-" + s_key, self_insert_command2("S-" + s_key))
 
     ## アルファベットキーの設定
     for vkey in range(VK_A, VK_Z + 1):
@@ -1840,13 +1845,13 @@ def configure(keymap):
 
                 # アプリケーションソフト
                 application_items = [
-                    ["notepad",     keymap.ShellExecuteCommand(None, r"notepad.exe", "", "")],
-                    ["sakura",      keymap.ShellExecuteCommand(None, r"C:\Program Files (x86)\sakura\sakura.exe", "", "")],
-                    ["explorer",    keymap.ShellExecuteCommand(None, r"explorer.exe", "", "")],
-                    ["cmd",         keymap.ShellExecuteCommand(None, r"cmd.exe", "", "")],
-                    ["chrome",      keymap.ShellExecuteCommand(None, r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe", "", "")],
-                    ["firefox",     keymap.ShellExecuteCommand(None, r"C:\Program Files (x86)\Mozilla Firefox\firefox.exe", "", "")],
-                    ["thunderbird", keymap.ShellExecuteCommand(None, r"C:\Program Files (x86)\Mozilla Thunderbird\thunderbird.exe", "", "")],
+                    ["Notepad",     keymap.ShellExecuteCommand(None, r"notepad.exe", "", "")],
+                    ["Explorer",    keymap.ShellExecuteCommand(None, r"explorer.exe", "", "")],
+                    ["Cmd",         keymap.ShellExecuteCommand(None, r"cmd.exe", "", "")],
+                    ["MSEdge",      keymap.ShellExecuteCommand(None, r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe", "", "")],
+                    ["Chrome",      keymap.ShellExecuteCommand(None, r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe", "", "")],
+                    ["Firefox",     keymap.ShellExecuteCommand(None, r"C:\Program Files (x86)\Mozilla Firefox\firefox.exe", "", "")],
+                    ["Thunderbird", keymap.ShellExecuteCommand(None, r"C:\Program Files (x86)\Mozilla Thunderbird\thunderbird.exe", "", "")],
                 ]
                 application_items[0][0] = list_formatter.format(application_items[0][0])
 
@@ -1857,7 +1862,7 @@ def configure(keymap):
                     ["Twitter",         keymap.ShellExecuteCommand(None, r"https://twitter.com/", "", "")],
                     ["Keyhac",          keymap.ShellExecuteCommand(None, r"https://sites.google.com/site/craftware/keyhac-ja", "", "")],
                     ["Fakeymacs",       keymap.ShellExecuteCommand(None, r"https://github.com/smzht/fakeymacs", "", "")],
-                    ["NTEmacs＠ウィキ", keymap.ShellExecuteCommand(None, r"http://www49.atwiki.jp/ntemacs/", "", "")],
+                    ["NTEmacs＠ウィキ", keymap.ShellExecuteCommand(None, r"http://w.atwiki.jp/ntemacs/", "", "")],
                 ]
                 website_items[0][0] = list_formatter.format(website_items[0][0])
 
