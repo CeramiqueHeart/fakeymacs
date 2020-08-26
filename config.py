@@ -676,7 +676,7 @@ def configure(keymap):
                 message = "[A]"
 
             # IME の状態をバルーンヘルプで表示する
-            keymap.popBalloon("ime_status", message, 500)
+            keymap.popBalloon("ime_status", message, 200)
 
     def reconversion(reconv_key, cancel_key):
         def _func():
@@ -695,32 +695,6 @@ def configure(keymap):
                     if fc.use_emacs_ime_mode:
                         enable_emacs_ime_mode()
         return _func
-
-    def enable_input_method():
-        keymap.wnd.setImeStatus(1)
-        delay(0.05)
-        display_input_method_status()
-
-    def disable_input_method():
-        keymap.wnd.setImeStatus(0)
-        delay(0.05)
-        display_input_method_status()
-
-    def display_input_method_status():
-        # IME の状態を格納する
-        ime_status = keymap.getWindow().getImeStatus()
-        if use_emacs_ime_mode:
-            fakeymacs.ei_ime_status = ime_status
-
-        if not fakeymacs.is_playing_kmacro:
-            if ime_status:
-                message = "あ"
-            else:
-                message = "A"
-
-            # IME の状態をバルーンヘルプで表示する
-            keymap.popBalloon("ime_status", message, 200)
-
 
     ##################################################
     ## ファイル操作
