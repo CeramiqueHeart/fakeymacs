@@ -350,8 +350,8 @@ def configure(keymap):
     fc.use_emacs_ime_mode = True
 
     # Emacs日本語入力モードが有効なときに表示するバルーンメッセージを指定する
-    # fc.emacs_ime_mode_balloon_message = None
-    fc.emacs_ime_mode_balloon_message = "▲"
+    fc.emacs_ime_mode_balloon_message = None
+    #fc.emacs_ime_mode_balloon_message = "▲"
 
     # Emacsシフトモードを使うかどうかを指定する（True: 使う、False: 使わない）
     fc.use_emacs_shift_mode = False
