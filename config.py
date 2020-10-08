@@ -277,14 +277,9 @@ def configure(keymap):
                                "TurboVNC.exe",           # TurboVNC
                                "vncviewer.exe",          # UltraVNC
                                "vncviewer64.exe",        # UltraVNC
-<<<<<<< HEAD
                                "Xpra-Launcher.exe",      # Xpra
                                "Poderosa.exe",           # Poderosa
                                "RLogin.exe",             # RLogin
-                               "mstsc.exe"               # Remote Desktop
-=======
->>>>>>> upstream/master
-                              ]
 
     # IME の切り替え“のみをしたい”アプリケーションソフトを指定する
     # （指定できるアプリケーションソフトは、not_emacs_target で（除外）指定したものからのみとなります）
