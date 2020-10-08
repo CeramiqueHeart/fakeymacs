@@ -4,9 +4,9 @@
 # https://docs.python.org/3/library/functions.html?highlight=exec%20global#exec
 
 # 本ファイルは、config_personal.py というファイル名にすることで個人設定用ファイルとして機能します。
-# 本ファイルの設定には [] で括られたセクション名が定義されており、その単位で config.py の中に設定が
-# 取り込まれ、exec 関数により実行されます。config.py ファイル内の exec 関数をコールしているところを
-# 検索すると、何のセクションがどこで読み込まれるかが分かると思います。
+# 本ファイルの設定には [] で括られたセクション名が定義されており、その単位で config.py の中に設定
+# が取り込まれ、exec関数により実行されます。config.py ファイル内の exec関数をコールしているところ
+# を検索すると、何のセクションがどこで読み込まれるかが分かると思います。
 
 # 本ファイルはサンプルファイルです。本ファイルに記載のない設定でも、config.py から設定を取り込み、
 # カスタマイズしてご利用ください。
@@ -15,6 +15,8 @@
 ## 初期設定
 ####################################################################################################
 # [section-init] -----------------------------------------------------------------------------------
+
+print(startupString())
 
 keymap.editor = r"notepad.exe"
 keymap.setFont("ＭＳ ゴシック", 12)
@@ -43,13 +45,11 @@ fc.use_change_keyboard = False
 
 # Emacs のキーバインドに“したくない”アプリケーションソフトを指定する
 # （Keyhac のメニューから「内部ログ」を ON にすると processname や classname を確認することができます）
-# fc.not_emacs_target.remove("Code.exe")
 fc.not_emacs_target    += [
                           ]
 
 # IME の切り替え“のみをしたい”アプリケーションソフトを指定する
 # （指定できるアプリケーションソフトは、not_emacs_target で（除外）指定したものからのみとなります）
-# fc.ime_target.remove("Code.exe")
 fc.ime_target          += [
                           ]
 
@@ -73,10 +73,15 @@ fc.skip_settings_key    = {"keymap_global"    : [],
 fc.emacs_exclusion_key  = {"chrome.exe"       : ["C-l", "C-t"],
                            "msedge.exe"       : ["C-l", "C-t"],
                            "firefox.exe"      : ["C-l", "C-t"],
+                           "Code.exe"         : ["C-S-b", "C-S-f", "C-S-p", "C-S-n", "C-S-a", "C-S-e"],
                           }
 
 # 左右どちらの Ctrlキーを使うかを指定する（"L": 左、"R": 右）
-fc.side_of_ctrl_key = "L"
+# fc.side_of_ctrl_key = "R"
+
+# Escキーを Metaキーとして使うかどうかを指定する（True: 使う、False: 使わない）
+# （True（Metaキーとして使う）に設定されている場合、ESC の二回押下で ESC が入力されます）
+# fc.use_esc_as_meta = True
 
 #---------------------------------------------------------------------------------------------------
 # IME を切り替えるキーの組み合わせ（disable、enable の順）を指定する（複数指定可）
@@ -96,28 +101,74 @@ fc.set_input_method_key += [["(29)", "(28)"]]
 # fc.set_input_method_key += [["C-j", "C-o"]]
 #---------------------------------------------------------------------------------------------------
 
+# VSCode の Terminal内 で ４つのキー（Ctrl+k、Ctrl+r、Ctrl+s、Ctrl+y）のダイレクト入力機能を使うか
+# どうかを指定する（True: 使う、False: 使わない）
+# fc.use_vscode_terminal_key_direct_input = True
+
+# アプリケーションキーとして利用するキーを指定する
+# （修飾キーに Alt は使えないようです）
+# fc.application_key = "O-RCtrl"
+# fc.application_key = "W-m"
+
 # [section-base-2] ---------------------------------------------------------------------------------
 
-# https://w.atwiki.jp/ntemacs/pages/75.html
+#---------------------------------------------------------------------------------------------------
+# VSCode で Extension のインストールが必要な機能は、個人設定用ファイルで設定する
 
-# emacsclient プログラムを起動するキーを指定する
-emacsclient_key = None
-# emacsclient_key = "C-Period"
+if 0:
+    # VSCode に vscode-dired Extension をインストールしてお使いください
+    # （Ctrl+x f に設定されているキーバインドは、Ctrl+x（Cut）の機能とバッティングするので、削除して
+    #   ください（Open Keyboard Shortcuts コマンドで削除可能です）)
 
-# emacsclient プログラムを指定する
-emacsclient_name = r"<Windows パス>\wslclient-n.exe"
+    def dired(func=dired):
+        if checkWindow("Code.exe", "Chrome_WidgetWin_1"): # VSCode
+            # VSCode Command : Open dired buffer
+            vscodeExecuteCommand("Op-di-bu")
+        else:
+            func()
 
-# emacsclient プログラムの起動
-def emacsclient():
-    clipboard_text = getClipboardText()
-    if clipboard_text:
-        path = re.sub("\n|\r", "", clipboard_text.strip())
-        path = re.sub(r'(\\+)"', r'\1\1"', path)
-        path = re.sub('"', r'\"', path)
-        path = re.sub('^', '"', path)
-        keymap.ShellExecuteCommand(None, emacsclient_name, path, "")()
+    define_key(keymap_emacs, "Ctl-x d", reset_search(reset_undo(reset_counter(reset_mark(dired)))))
 
-define_key(keymap_emacs, emacsclient_key, emacsclient)
+if 0:
+    # VSCode に Center Editor Window Extension をインストールしてお使いください
+
+    def recenter(func=recenter):
+        if checkWindow("Code.exe", "Chrome_WidgetWin_1"): # VSCode
+            # VSCode Command : Center Editor Window
+            self_insert_command("C-l")()
+        else:
+            func()
+
+    define_key(keymap_emacs, "C-l", reset_search(reset_undo(reset_counter(recenter))))
+
+if 0:
+    # VSCode に Search in Current File Extension をインストールしてお使いください
+    # （アクティビティバーの SEARCH アイコンをパネルのバーにドラッグで持っていくと、検索結果が
+    #   パネルに表示されるようになり、使いやすくなります）
+
+    def occur():
+        if checkWindow("Code.exe", "Chrome_WidgetWin_1"): # VSCode
+            # VSCode Command : Search in Current File
+            vscodeExecuteCommand("Se-in-Cu-Fi")
+
+    define_key(keymap_emacs, "Ctl-x C-o", reset_search(reset_undo(reset_counter(reset_mark(occur)))))
+#---------------------------------------------------------------------------------------------------
+
+#---------------------------------------------------------------------------------------------------
+# Everything プログラムを起動するキーを指定する
+
+if 0:
+    # Everything を起動するキーを指定する
+    everything_key = "C-A-v"
+
+    # Everything プログラムを指定する
+    everything_name = r"C:\Program Files\Everything\everything.exe"
+
+    def everything():
+        keymap.ShellExecuteCommand(None, everything_name, "", "")()
+
+    define_key(keymap_global, everything_key, everything)
+#---------------------------------------------------------------------------------------------------
 
 ####################################################################################################
 ## クリップボードリストの設定
@@ -195,7 +246,7 @@ fc.lclisters = [
 # [section-lancherList-2] --------------------------------------------------------------------------
 
 ####################################################################################################
-## C-Enter に F2（編集モード移行）を割り当てる（オプション）
+## C-Enter に F2（編集モード移行）を割り当てる
 ####################################################################################################
 # [section-edit_mode-1] ----------------------------------------------------------------------------
 
@@ -205,13 +256,13 @@ fc.edit_mode_target = [["EXCEL.EXE",    "EXCEL*"],
 # [section-edit_mode-2] ----------------------------------------------------------------------------
 
 ####################################################################################################
-## Emacs の場合、IME 切り替え用のキーを C-\ に置き換える（オプション）
+## Emacs の場合、IME 切り替え用のキーを C-\ に置き換える
 ####################################################################################################
 # [section-real_emacs-1] ---------------------------------------------------------------------------
 # [section-real_emacs-2] ---------------------------------------------------------------------------
 
 ####################################################################################################
-## 英語キーボード設定をした OS 上で、日本語キーボードを利用する場合の切り替えを行う（オプション）
+## 英語キーボード設定をした OS 上で、日本語キーボードを利用する場合の切り替えを行う
 ####################################################################################################
 # [section-change_keyboard-1] ----------------------------------------------------------------------
 # [section-change_keyboard-2] ----------------------------------------------------------------------
