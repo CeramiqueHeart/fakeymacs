@@ -8,51 +8,153 @@ Keyhac for Windows ver 1.82 以上のバージョンでご利用ください。
 
 - https://sites.google.com/site/craftware/keyhac-ja
 
-詳しくは以下を参照してください。
+manual は次のリンクを参照ください。
+
+- [[manual.org][manual]]
+- [[manual_option.org][manual (option)]]
+
+次のページにも関連の情報があります。
 
 - [[https://www49.atwiki.jp/ntemacs/pages/25.html][Windows の操作を Emacs のキーバインドで行うための設定 （Keyhac版）]]
 
-** Light バージョン
+** 本設定のキーバインドがサポートする機能
 
-機能を制限した Light バージョン（config_light.py）も登録しました。Full バージョン（config.py）
-との違いは以下のとおりとなります。
+本設定のキーバインドでは、下記の機能をサポートしています。
 
-|--------------------------------------------------+--------------------+-----------------|
-| 機能                                             | config.py          | config_light.py |
-|--------------------------------------------------+--------------------+-----------------|
-| Emacs標準キーバインド                            | ○                 | ○              |
-| Emacs日本語入力モード [1]                        | ○                 | ○              |
-| Emacsシフトモード [2]                            | ○（初期値：無効） | ×              |
-| other_window                                     | ○                 | ×              |
-| shell_command                                    | ○                 | ×              |
-| ウィンドウの最小化、リストア                     | ○                 | ×              |
-| アクティブウィンドウの切り替え                   | ○ [3]             | ○ [3]          |
-| アクティブウィンドウのディスプレイ間移動         | ○                 | ×              |
-| 仮想デスクトップの切り替え                       | ○                 | ×              |
-| クリップボードリスト                             | ○                 | ×              |
-| ランチャーリスト                                 | ○                 | ×              |
-| Excel や Emacs と連携するためのオプション設定    | ○（初期値：無効） | ×              |
-| キーボードを切替えて利用するためのオプション設定 | ○（初期値：無効） | ×              |
-|--------------------------------------------------+--------------------+-----------------|
+- Emacs標準キーバインド
+- Emacs日本語入力モード [1]
+- other_window（一番最近までフォーカスがあったウィンドウに移動する機能）
+- shell_command（コマンドコンソールを起動する機能）
+- ウィンドウの最小化、リストア
+- アクティブウィンドウの切り替え [2]
+- アクティブウィンドウのディスプレイ間移動
+- 仮想デスクトップの切り替え
+- クリップボードリスト
+- ランチャーリスト
+
+オプションとして、下記の機能も利用可能です。
+
+- C-Enter に F2（編集モード移行）を割り当てる
+- Emacs の場合、IME 切り替え用のキーを C-\ に置き換える
+- 英語キーボード設定をした OS 上で、日本語キーボードを利用する場合の切り替えを行う
 
 [1] IME が ON の時に文字（英数字か、スペースを除く特殊文字）を入力すると起動するモードです。
 （モードに入ると、▲のマークが表示されます。） Emacs日本語入力モードになると Emacsキーバインド
 として利用できるキーが限定され、その他のキーは Windows にそのまま渡されるようになるため、
 IME のショートカットキーが利用できるようになります。
+また、このモードでは IME のショートカットを置き換える機能もサポートしており、初期値では
+「ことえり」のキーバインドを利用できるようにしています。
 
-[2] 本設定のキーバインドと IME のショートカットキーが被って設定されている場合、日本語入力中に
-そのキーを Shiftキーと一緒に押すことで IME のショートカットキーが利用できるようになるモードです。
-
-[3] アクティブウィンドウの切り替えのキーの初期値は未設定（None）としています。このため、起動
+[2] アクティブウィンドウの切り替えのキーの初期値は未設定（None）としています。このため、起動
 するためのキーは、デフォルトキーの A-S-Tab、A-Tab となります。起動後は A-p、A-n で
 アクティブウィンドウの切り替え、A-g で切り替え画面の終了（キャンセル）が利用できます。
 
-** その他
+** VSCode の強化ポイント
 
-上記で紹介している wiki のページに詳しく書いておりますが、本設定は IME を 「Google 日本語入力」
-とし、プロパティの「キー設定」を「ことえり」にしたときに最適に動作するように調整しています。
-「Google 日本語入力」は、mozc_emacs_helper.exe を利用することで NTEmacs や WSL の Emacs とも
-連携可能な IME となっておりますので、利用されていない方は是非お試しください。
+VSCode については、一般的な Emacs キーバインドの他に次のキーバインドを利用できるようにしています。
 
-⇒ （2020/05/10 追記） emacs_ime_mode_key 変数の追加により、Micorosoft IME でも「ことえり」と
-同様なキーバインドを設定できるようになりました。
+|-------------+-------------------------------+----------------------------------------|
+| Key-binding | Fakeymacs Function            | VSCode Command                         |
+|-------------+-------------------------------+----------------------------------------|
+| Meta+x      | execute_extended_command      | Show All Commands                      |
+| Ctl+x o     | other_group                   | Navigate Between Editor Groups         |
+| Ctl+x 0     | delete_group                  | Close All Editors in Group             |
+| Ctl+x 1     | delete_other_groups           | Close Editors in Other Groups          |
+| Ctl+x 2     | split_editor_below            | Split Editor Orthogonal                |
+| Ctl+x 3     | split_editor_right            | Split Editor                           |
+| Meta+;      | comment_dwim                  | Toggle Line Comment                    |
+| Ctrl+Alt+p  | mark_up                       | cursorColumnSelectUp                   |
+| Ctrl+Alt+n  | mark_down                     | cursorColumnSelectDown                 |
+| Ctrl+Alt+b  | mark + backward_char          | cursorLeftSelect                       |
+| Ctrl+Alt+f  | mark + forward_char           | cursorRightSelect                      |
+| Ctrl+Alt+a  | mark + move_beginning_of_line | cursorHomeSelect                       |
+| Ctrl+Alt+e  | mark + move_end_of_line       | cursorEndSelect                        |
+| Ctrl+Alt+d  | mark_next_like_this           | Add Selection To Next Find Match       |
+| Ctrl+Alt+s  | skip_to_next_like_this        | Move Last Selection To Next Find Match |
+|-------------+-------------------------------+----------------------------------------|
+
+VSCode に Center Editor Window Extension、vcode-dired Extension、Search in Current File を
+インストールすることにより、次のキーバインドも利用が可能となります。利用するための設定は
+_config_personal.py の中に記載しています。
+
+|--------------+--------------------+------------------------|
+| Key-binding  | Fakeymacs Function | VSCode Command         |
+|--------------+--------------------+------------------------|
+| Ctrl+l       | recenter           | Center Editor Window   |
+| Ctl+x d      | dired              | Open dired buffer      |
+| Ctl+x Ctrl+o | occor              | Search in Current File |
+|--------------+--------------------+------------------------|
+
+※ Meta で Esc を利用したい場合には、use_esc_as_meta 変数を True にしてください。True にした
+場合に Esc を入力するには、Esc を二回押下してください。
+
+※ これらの機能を実現するにあたり、vscodeExecuteCommand 関数を作成しています。この関数を使う
+ことにより、ショートカットキーが割り当てられていない VSCode のコマンドでも、Fakeymacs から
+実行できるようにしています。
+
+※ vscodeExecuteCommand 関数内では日本語入力モードの切り替えを行っているのですが、Google 
+日本語入力を利用して入力モードのポップアップを表示する設定にしている場合、このポップアップが
+何度も表示される症状が発生するようです。このため、ポップアップを非表示にする設定にしてご利用
+ください。（https://memotora.com/2014/10/05/google-ime-pop-up-setting/）
+
+*** ● use_vscode_terminal_key_direct_input 変数
+
+VSCode の WSL Terminal内 で Ctrl+k、Ctrl+r、Ctrl+s、Ctrl+y の４つのキーをダイレクト入力できる
+ようにするため、この変数を導入しています。初期値を False（使わない）とし、仕様を理解した方のみ
+使う機能としています。
+
+use_vscode_terminal_key_direct_input 変数を True にしている場合には、次のキーを押下して
+Terminal に移行すことで、上記の４つのキーの入力ができるようになります。
+
+|------------------------------+--------------------+----------------------------------|
+| Key-binding                  | Fakeymacs Function | VSCode Command                   |
+|------------------------------+--------------------+----------------------------------|
+| Ctrl+BackQuote（US）         | toggle_terminal    | Toggle Integrated Terminal -like |
+| Ctrl+[半角/全角]（JP）       | toggle_terminal    | Toggle Integrated Terminal -like |
+| Ctrl+Atmark（JP）            | toggle_terminal    | Toggle Integrated Terminal -like |
+|------------------------------+--------------------+----------------------------------|
+| Ctrl+Shift+BackQuote（US）   | create_terminal    | Create New Integrated Terminal   |
+| Ctrl+Shift+[半角/全角]（JP） | create_terminal    | Create New Integrated Terminal   |
+| Ctrl+Shift+Atmark（JP）      | create_terminal    | Create New Integrated Terminal   |
+|------------------------------+--------------------+----------------------------------|
+
+※ Ctrl+k を利用できるようにするには、VSCode の 設定で terminal.integrated.allowChords
+を false にする必要があります。
+（https://code.visualstudio.com/docs/editor/integrated-terminal#_chord-keybindings-in-the-terminal）
+
+※ Ctrl+s を利用できるようにするには、bash で stty stop undef の設定をする必要があります。
+この設定をしないでこのキーを押下すると stop から戻れなくなりますのでご注意ください。
+
+※ toggle_terminal 関数内では、Terminal にフォーカスを移すために vscodeExecuteCommand("Te:Fo-Te")
+という関数を発行しています。これは Command Palette で Terminal: Focus Terminal という
+コマンドを起動することを期待しているものなのですが、"Te:Fo-Te" ではこのコマンドをユニークに
+特定できないため、コマンドリストで一番上に表示されるコマンド（一番最近起動したコマンド）が
+マッチして起動されます。
+このため、一度 Command Palette で Terminal: Focus Terminal を手動起動し、コマンドリストの
+一番上でこのコマンドがマッチするようにしてから利用するようにしてください。
+（Terminal: Focus on Terminal View というコマンドの利用も検討しましたが、Japanese Language
+Pack 利用時にコマンド名称が変わるため、採用を見送りました。）
+
+Terminal から抜ける場合は次のキーを利用するようにしてください。先の４つのキーが VSCode の
+ショートカットキーとして認識されるように戻ります。
+
+|------------------------+--------------------+-------------------------------------|
+| Key-binding            | Fakeymacs Function | VSCode Command                      |
+|------------------------+--------------------+-------------------------------------|
+| Ctrl+BackQuote（US）   | toggle_terminal    | Toggle Integrated Terminal -like    |
+| Ctrl+[半角/全角]（JP） | toggle_terminal    | Toggle Integrated Terminal -like    |
+| Ctrl+Atmark（JP）      | toggle_terminal    | Toggle Integrated Terminal -like    |
+|------------------------+--------------------+-------------------------------------|
+| Ctrl+[数字キー]        | switch_focus       | Focus Side Bar or n-th Editor Group |
+| Ctl+x o                | other_group        | Navigate Between Editor Groups      |
+|------------------------+--------------------+-------------------------------------|
+
+マウスのクリックでカーソル位置の変更を行うと、この状態の認識に齟齬が発生することがあります。
+その場合は、上記のいずれかのキーを押下することにより、Fakeymacs に現在の状態を再認識させる
+ようにしてください。
+
+※ use_vscode_terminal_key_direct_input 変数が False（初期値）の場合には、 Ctrl+q を前置する
+ことで４つのキーを利用することができます。
+
+※ この機能をサポートするために use_ctrl_atmark_for_mark 変数を導入し、日本語キーボードで C-@
+をマーク用のキーとして使うかどうかを指定できるようにしました。初期値は False（使わない）です。
