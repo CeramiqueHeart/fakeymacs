@@ -226,9 +226,9 @@ def configure(keymap):
     ###########################################################################
 
     # IMEの設定（３つの設定のいずれか一つを True にする）
-    fc.use_old_Microsoft_IME = True
+    fc.use_old_Microsoft_IME = False
     fc.use_new_Microsoft_IME = False
-    fc.use_Google_IME = False
+    fc.use_Google_IME = True
 
     # Emacs のキーバインドにするウィンドウのクラスネームを指定する（全ての設定に優先する）
     fc.emacs_target_class   = ["Edit"]                   # テキスト入力フィールドなどが該当
@@ -436,12 +436,12 @@ def configure(keymap):
     # （Microsoft IME で「ことえり」のキーバインドを利用するための設定例です。Google日本語入力で
     #   「ことえり」のキー設定になっている場合には不要ですが、設定を行っていても問題はありません。）
     fc.emacs_ime_mode_key = []
-    fc.emacs_ime_mode_key += [["C-i", "S-Left"],      # 文節を縮める
-                              ["C-o", "S-Right"],     # 文節を伸ばす
-                              ["C-j", "F6"],          # ひらがなに変換
-                              ["C-k", "F7"],          # 全角カタカナに変換
-                              ["C-l", "F9"],          # 全角英数に表示切替
-                              ["C-Semicolon", "F8"]]  # 半角に変換
+    # fc.emacs_ime_mode_key += [["C-i", "S-Left"],      # 文節を縮める
+    #                           ["C-o", "S-Right"],     # 文節を伸ばす
+    #                           ["C-j", "F6"],          # ひらがなに変換
+    #                           ["C-k", "F7"],          # 全角カタカナに変換
+    #                           ["C-l", "F9"],          # 全角英数に表示切替
+    #                           ["C-Semicolon", "F8"]]  # 半角に変換
 
     if is_japanese_keyboard:
         fc.emacs_ime_mode_key += [["C-Colon", "F10"]] # 半角英数に表示切替
