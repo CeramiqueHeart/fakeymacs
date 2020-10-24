@@ -1,12 +1,11 @@
-﻿# -*- mode: python; coding: utf-8-with-signature-dos -*-
+# -*- mode: python; coding: utf-8-with-signature-dos -*-
 
 ##                               nickname: Fakeymacs
 ##
 ## Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）
 ##
 
-fakeymacs_cfgname = "Fakeymacs"
-fakeymacs_version = "20201010_01"
+fakeymacs_version = "20201016_01"
 
 # このスクリプトは、Keyhac for Windows ver 1.82 以降で動作します。
 #   https://sites.google.com/site/craftware/keyhac-ja
@@ -58,7 +57,7 @@ fakeymacs_version = "20201010_01"
 #     ・scroll_key 変数で指定したスクロールキー
 #   Emacs日本語入力モードは、次の操作で終了する。
 #   ・Enter、C-m または C-g が押された場合
-#   ・[半角／全角] キー、A-` キーが押された場合
+#   ・<半角／全角> キー、A-` キーが押された場合
 #   ・BS、C-h 押下直後に toggle_input_method_key 変数や set_input_method_key 変数の
 #     disable で指定したキーが押された場合
 #     （間違って日本語入力をしてしまった時のキー操作を想定しての対策）
@@ -199,22 +198,35 @@ def configure(keymap):
 
         return config_section
 
-    def readConfigOption(config_file):
+    def readConfigExtension(config_file):
         try:
             with open(dataPath() + "\\" + config_file, "r", encoding="utf-8-sig") as f:
-                config_option = f.read()
+                config_extension = f.read()
         except:
-            print("オプション設定ファイル {} の読み込みに失敗しました".format(config_file))
-            config_option = ""
+            print("拡張機能ファイル {} の読み込みに失敗しました".format(config_file))
+            config_extension = ""
 
-        return config_option
+        return config_extension
 
     def startupString():
-        startup_string_formatter = "{} version {}:\n  https://github.com/smzht/fakeymacs\n"
-        return startup_string_formatter.format(fakeymacs_cfgname, fakeymacs_version)
+        startup_string_formatter = "Fakeymacs version {}:\n  https://github.com/smzht/fakeymacs\n"
+        return startup_string_formatter.format(fakeymacs_version)
 
     # 個人設定ファイルのセクション [section-init] を読み込んで実行する
     exec(readConfigPersonal("[section-init]"), dict(globals(), **locals()))
+
+
+    ####################################################################################################
+    ## 機能オプションの選択
+    ####################################################################################################
+
+    # IMEの設定（３つの設定のいずれか一つを True にする）
+    fc.use_old_Microsoft_IME = False
+    fc.use_new_Microsoft_IME = False
+    fc.use_Google_IME = True
+
+    # 個人設定ファイルのセクション [section-options] を読み込んで実行する
+    exec(readConfigPersonal("[section-options]"), dict(globals(), **locals()))
 
 
     ####################################################################################################
@@ -224,11 +236,6 @@ def configure(keymap):
     ###########################################################################
     ## カスタマイズパラメータの設定
     ###########################################################################
-
-    # IMEの設定（３つの設定のいずれか一つを True にする）
-    fc.use_old_Microsoft_IME = False
-    fc.use_new_Microsoft_IME = False
-    fc.use_Google_IME = True
 
     # Emacs のキーバインドにするウィンドウのクラスネームを指定する（全ての設定に優先する）
     fc.emacs_target_class   = ["Edit"]                   # テキスト入力フィールドなどが該当
@@ -312,7 +319,6 @@ def configure(keymap):
                                "keymap_ei"        : [],
                                "keymap_tsw"       : [],
                                "keymap_lw"        : [],
-                               "keymap_edit_mode" : [],
                               }
 
     # Emacs のキーバインドにするアプリケーションソフトで、Emacs キーバインドから除外するキーを指定する
@@ -372,10 +378,12 @@ def configure(keymap):
     # （toggle_input_method_key のキー設定より優先します）
     fc.set_input_method_key = []
 
-    ## 日本語キーボードを利用している場合、[無変換] キーで英数入力、[変換] キーで日本語入力となる
+    ## 日本語キーボードを利用している場合、<無変換> キーで英数入力、<変換> キーで日本語入力となる
     fc.set_input_method_key += [["(29)", "(28)"]]
 
     ## LAlt の単押しで英数入力、RAlt の単押しで日本語入力となる
+    ## （JetBrains 製の IDE でこの設定を利用するためには、ツールボタンをオンにする必要があるようです。
+    ##   設定は、View -> Appearance -> Tool Window Bars を有効にしてください。）
     # fc.set_input_method_key += [["O-LAlt", "O-RAlt"]]
 
     ## C-j や C-j C-j で 英数入力となる（toggle_input_method_key の設定と併せ、C-j C-o で日本語入力となる）
@@ -394,7 +402,7 @@ def configure(keymap):
     ##   ただし、C-Back キーは設定しないでください。）
     fc.reconversion_key = []
     fc.reconversion_key += ["C-t"]
-    # fc.reconversion_key += ["(28)"]   # [変換] キーを利用する場合でも、本機能を全て使うためには設定が必要
+    # fc.reconversion_key += ["(28)"]   # <変換> キーを利用する場合でも、本機能を全て使うためには設定が必要
     # fc.reconversion_key += ["O-RAlt"] # ワンショットモディファイアの指定も可能
 
     ## IME に設定してある「再変換」、「確定取り消し」を行うキーを指定する
@@ -471,7 +479,7 @@ def configure(keymap):
 
     # 日本語キーボードで C-@ をマーク用のキーとして使うかどうかを指定する（True: 使う、False: 使わない）
     # （VSCode で C-@ を Toggle Integrated Terminal 用のキーとして使えるようにするために設けた設定です。
-    #   True に設定した場合でも、Toggle Integrated Terminal 用のキーとしえて  C-[半角/全角] が使えます。）
+    #   True に設定した場合でも、Toggle Integrated Terminal 用のキーとしえて  C-<半角／全角> が使えます。）
     fc.use_ctrl_atmark_for_mark = False
 
     # VSCode の Terminal内 で ４つのキー（Ctrl+k、Ctrl+r、Ctrl+s、Ctrl+y）のダイレクト入力機能を使うか
@@ -1256,6 +1264,37 @@ def configure(keymap):
             if clipboard_text:
                 keymap.clipboard_history._push(clipboard_text)
 
+    def resetRegion():
+        if fakeymacs.forward_direction is not None:
+
+            if checkWindow(None, "Edit"): # Edit クラス
+                # 選択されているリージョンのハイライトを解除するためにカーソルキーを発行する
+                if fakeymacs.forward_direction:
+                    self_insert_command("Right")()
+                else:
+                    self_insert_command("Left")()
+
+            elif checkWindow("cmd.exe", "ConsoleWindowClass"): # Cmd
+                # 選択されているリージョンのハイライトを解除するためにカーソルを移動する
+                if fakeymacs.forward_direction:
+                    self_insert_command("Right", "Left")()
+                else:
+                    self_insert_command("Left", "Right")()
+
+            elif (checkWindow("powershell.exe", "ConsoleWindowClass") or # PowerShell
+                  checkWindow("EXCEL.EXE", None)):                       # Microsoft Excel
+                # 選択されているリージョンのハイライトを解除するためにカーソルを移動する
+                if fakeymacs.forward_direction:
+                    self_insert_command("Left", "Right")()
+                else:
+                    self_insert_command("Right", "Left")()
+            else:
+                # 選択されているリージョンのハイライトを解除するためにカーソルキーを発行する
+                if fakeymacs.forward_direction:
+                    self_insert_command("Right")()
+                else:
+                    self_insert_command("Left")()
+
     def checkWindow(processName, className, window=None):
         if window is None:
             window = keymap.getWindow()
@@ -1308,7 +1347,6 @@ def configure(keymap):
                 keymap_ei
                 keymap_tsw
                 keymap_lw
-                keymap_edit_mode
             except:
                 pass
 
@@ -1388,37 +1426,6 @@ def configure(keymap):
             fakeymacs.is_universal_argument = True
             digit_argument(number)
         return _func
-
-    def resetRegion():
-        if fakeymacs.forward_direction is not None:
-
-            if checkWindow(None, "Edit"): # Edit クラス
-                # 選択されているリージョンのハイライトを解除するためにカーソルキーを発行する
-                if fakeymacs.forward_direction:
-                    self_insert_command("Right")()
-                else:
-                    self_insert_command("Left")()
-
-            elif checkWindow("cmd.exe", "ConsoleWindowClass"): # Cmd
-                # 選択されているリージョンのハイライトを解除するためにカーソルを移動する
-                if fakeymacs.forward_direction:
-                    self_insert_command("Right", "Left")()
-                else:
-                    self_insert_command("Left", "Right")()
-
-            elif (checkWindow("powershell.exe", "ConsoleWindowClass") or # PowerShell
-                  checkWindow("EXCEL.EXE", None)):                       # Microsoft Excel
-                # 選択されているリージョンのハイライトを解除するためにカーソルを移動する
-                if fakeymacs.forward_direction:
-                    self_insert_command("Left", "Right")()
-                else:
-                    self_insert_command("Right", "Left")()
-            else:
-                # 選択されているリージョンのハイライトを解除するためにカーソルキーを発行する
-                if fakeymacs.forward_direction:
-                    self_insert_command("Right")()
-                else:
-                    self_insert_command("Left")()
 
     def mark(func, forward_direction):
         def _func():
@@ -1874,7 +1881,7 @@ def configure(keymap):
                 func = ei_keymap[keyCondition]
             else:
                 if key.startswith("O-"):
-                    func = ei_record_func(self_insert_command("(28)")) # [変換]キー 発行
+                    func = ei_record_func(self_insert_command("(28)")) # <変換> キーを発行
                 else:
                     func = ei_record_func(self_insert_command(key))
 
@@ -1891,7 +1898,7 @@ def configure(keymap):
                 func = ei_keymap[keyCondition]
             else:
                 if key.startswith("O-"):
-                    func = ei_record_func(self_insert_command("(29)")) # [無変換]キー 発行
+                    func = ei_record_func(self_insert_command("(29)")) # <無変換> キーを発行
                 else:
                     func = ei_record_func(self_insert_command(key))
 
@@ -2090,22 +2097,22 @@ def configure(keymap):
         def makeWindowList(wnd, arg):
             if wnd.isVisible() and not wnd.getOwner():
 
-                class_name = wnd.getClassName()
+                className = wnd.getClassName()
                 title = wnd.getText()
 
-                if class_name == "Emacs" or title != "":
-                    if not re.match(fc.window_operation_exclusion_class, class_name):
-                        process_name = wnd.getProcessName()
-                        if not re.match(fc.window_operation_exclusion_process, process_name):
+                if className == "Emacs" or title != "":
+                    if not re.match(fc.window_operation_exclusion_class, className):
+                        processName = wnd.getProcessName()
+                        if not re.match(fc.window_operation_exclusion_process, processName):
                             # 表示されていないストアアプリ（「設定」等）が window_list に登録されるのを抑制する
-                            if class_name == "Windows.UI.Core.CoreWindow":
+                            if className == "Windows.UI.Core.CoreWindow":
                                 if title in window_dict:
                                     if window_dict[title] in window_list:
                                         window_list.remove(window_dict[title])
                                 else:
                                     window_dict[title] = wnd
 
-                            elif class_name == "ApplicationFrameWindow":
+                            elif className == "ApplicationFrameWindow":
                                 if title not in window_dict:
                                     window_dict[title] = wnd
                                     window_list.append(wnd)
@@ -2232,12 +2239,10 @@ def configure(keymap):
     # ２）Emacsキーバインドを適用していないアプリケーションソフトからクリップボードリストを起動
     #     → S-Enter（テキストをクリップボードに格納）
     #
-    # （Emacsキーバインドを適用しないアプリケーションソフトには、キーの入出力の方式が特殊な
-    #   ものが多く指定されているため、テキストの貼り付けがうまく機能しないものがあります。
-    #   このため、アプリケーションソフトにペーストする場合は、そのアプリケーションソフトの
-    #   ペースト操作で行うことを前提とし、上記のとおりの仕様としてます。もし、どうしても
-    #   Enter（テキストの貼り付け）の入力を行いたい場合には、C-m の押下により対応できます。
-    #   なお、C-Enter（引用記号付で貼り付け）の置き換えは、対応が複雑となるため行っておりません。）
+    # ※ Emacsキーバインドを適用しないアプリケーションソフトには、文字の入出力の方式が特殊な
+    #    ものもあるため、テキストの貼り付けはそのアプリケーションソフトのペースト操作で行う
+    #    ことを前提としています。
+    # ※ C-Enter（引用記号付で貼り付け）の置き換えは、対応が複雑となるため行っておりません。
 
     def is_list_window(window):
         if window.getClassName() == "KeyhacWindowClass" and window.getText() != "Keyhac":
@@ -2508,8 +2513,8 @@ def configure(keymap):
 
 
     ####################################################################################################
-    ## オプション機能の設定
+    ## 拡張機能の設定
     ####################################################################################################
 
-    # 個人設定ファイルのセクション [section-option] を読み込んで実行する
-    exec(readConfigPersonal("[section-option]"), dict(globals(), **locals()))
+    # 個人設定ファイルのセクション [section-extensions] を読み込んで実行する
+    exec(readConfigPersonal("[section-extensions]"), dict(globals(), **locals()))

@@ -3,7 +3,7 @@
 # https://stackoverflow.com/questions/2904274/globals-and-locals-in-python-exec
 # https://docs.python.org/3/library/functions.html?highlight=exec%20global#exec
 
-# 本ファイルは、config_personal.py というファイル名にすることで個人設定用ファイルとして機能します。
+# 本ファイルは、config_personal.py というファイル名にすることで個人設定ファイルとして機能します。
 # 本ファイルの設定には [] で括られたセクション名が定義されており、その単位で config.py の中に設定
 # が取り込まれ、exec関数により実行されます。config.py ファイル内の exec関数をコールしているところ
 # を検索すると、何のセクションがどこで読み込まれるかが分かると思います。
@@ -22,14 +22,19 @@ keymap.editor = r"notepad.exe"
 keymap.setFont("ＭＳ ゴシック", 12)
 
 ####################################################################################################
-## 基本設定
+## 機能オプションの選択
 ####################################################################################################
-# [section-base-1] ---------------------------------------------------------------------------------
+# [section-options] --------------------------------------------------------------------------------
 
 # IMEの設定（３つの設定のいずれか一つを True にする）
 fc.use_old_Microsoft_IME = True
 fc.use_new_Microsoft_IME = False
 fc.use_Google_IME = False
+
+####################################################################################################
+## 基本設定
+####################################################################################################
+# [section-base-1] ---------------------------------------------------------------------------------
 
 # Emacs のキーバインドに“したくない”アプリケーションソフトを指定する
 # （Keyhac のメニューから「内部ログ」を ON にすると processname や classname を確認することができます）
@@ -52,7 +57,6 @@ fc.skip_settings_key    = {"keymap_global"    : [],
                            "keymap_ei"        : [],
                            "keymap_tsw"       : [],
                            "keymap_lw"        : [],
-                           "keymap_edit_mode" : [],
                           }
 
 # Emacs のキーバインドにするアプリケーションソフトで、Emacs キーバインドから除外するキーを指定する
@@ -76,10 +80,12 @@ fc.emacs_exclusion_key  = {"chrome.exe"       : ["C-l", "C-t"],
 # （toggle_input_method_key のキー設定より優先します）
 fc.set_input_method_key = []
 
-## 日本語キーボードを利用している場合、[無変換] キーで英数入力、[変換] キーで日本語入力となる
+## 日本語キーボードを利用している場合、<無変換> キーで英数入力、<変換> キーで日本語入力となる
 fc.set_input_method_key += [["(29)", "(28)"]]
 
 ## LAlt の単押しで英数入力、RAlt の単押しで日本語入力となる
+## （JetBrains 製の IDE でこの設定を利用するためには、ツールボタンをオンにする必要があるようです。
+##   設定は、View -> Appearance -> Tool Window Bars を有効にしてください。）
 # fc.set_input_method_key += [["O-LAlt", "O-RAlt"]]
 
 ## C-j や C-j C-j で 英数入力となる（toggle_input_method_key の設定と併せ、C-j C-o で日本語入力となる）
@@ -101,7 +107,7 @@ fc.set_input_method_key += [["(29)", "(28)"]]
 # [section-base-2] ---------------------------------------------------------------------------------
 
 #---------------------------------------------------------------------------------------------------
-# VSCode で Extension のインストールが必要な機能は、個人設定用ファイルで設定する
+# VSCode で Extension のインストールが必要な機能は、個人設定ファイルで設定する
 
 if 0:
     # VSCode に vscode-dired Extension をインストールしてお使いください
@@ -234,15 +240,15 @@ fc.lancherList_listers = [
 # [section-lancherList-2] --------------------------------------------------------------------------
 
 ####################################################################################################
-## オプション機能の設定
+## 拡張機能の設定
 ####################################################################################################
-# [section-option] --------------------------------------------------------------------------------
+# [section-extensions] -----------------------------------------------------------------------------
 
-# # 「C-Enter に F2（編集モード移行）を割り当てる」機能
-# exec(readConfigOption("config_option-edit_mode.py"), dict(globals(), **locals()))
+# C-Enter に F2（編集モード移行）を割り当てる
+# exec(readConfigExtension("fakeymacs_extensions/extension-edit_mode.py"), dict(globals(), **locals()))
 
-# # 「Emacs の場合、IME 切り替え用のキーを C-\ に置き換える」機能
-# exec(readConfigOption("config_option-read_emacs.py"), dict(globals(), **locals()))
+# Emacs の場合、IME 切り替え用のキーを C-\ に置き換える
+# exec(readConfigExtension("fakeymacs_extensions/extension-real_emacs.py"), dict(globals(), **locals()))
 
-# # 「英語キーボード設定をした OS 上で、日本語キーボードを利用する場合の切り替えを行う」機能
-# exec(readConfigOption("config_option-change_keyboard.py"), dict(globals(), **locals()))
+# 英語キーボード設定をした OS 上で、日本語キーボードを利用する場合の切り替えを行う
+# exec(readConfigExtension("fakeymacs_extensions/extension-change_keyboard.py"), dict(globals(), **locals()))
