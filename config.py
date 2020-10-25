@@ -361,7 +361,8 @@ def configure(keymap):
     fc.scroll_key = ["M-v", "C-v"]
 
     # Emacs日本語入力モードを使うかどうかを指定する（True: 使う、False: 使わない）
-    fc.use_emacs_ime_mode = True
+    #fc.use_emacs_ime_mode = True
+    fc.use_emacs_ime_mode = False
 
     # Emacs日本語入力モードが有効なときに表示するバルーンメッセージを指定する
     fc.emacs_ime_mode_balloon_message = None
