@@ -9,7 +9,7 @@ Keyhac for Windows ver 1.82 以上のバージョンでご利用ください。
 
 - https://sites.google.com/site/craftware/keyhac-ja
 
-manual は次のリンクを参照ください。
+manual は次のリンクを参照してください。
 
 1. [[fakeymacs_manuals/configuration_parameters.org][Configuration parameters]]
 1. [[fakeymacs_manuals/key_bindings.org][Key bindings]]
@@ -34,12 +34,7 @@ manual は次のリンクを参照ください。
 - 仮想デスクトップの切り替え
 - クリップボードリスト
 - ランチャーリスト
-
-オプションとして、下記の拡張機能も利用可能です。
-
-- C-Enter に F2（編集モード移行）を割り当てる
-- Emacs の場合、IME 切り替え用のキーを C-\ に置き換える
-- 英語キーボード設定をした OS 上で、日本語キーボードを利用する場合の切り替えを行う
+- 拡張機能（Extensions）で実現している機能
 
 [1] IME が ON の時に文字（英数字か、スペースを除く特殊文字）を入力すると起動するモードです。
 （モードに入ると、▲のマークが表示されます。） Emacs日本語入力モードになると Emacsキーバインド
@@ -118,19 +113,19 @@ config_personal.py という名称に変更し、このファイルを修正す�
 
 次は、修正する必要性が高いと思われるコンフィグレーションパラメータです。
 
-|----------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------|
-| Configuration Parameter                                        | Description                                                                                                      |
-|----------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------|
-| use_old_Microsoft_IME / use_new_Microsoft_IME / use_Google_IME | IMEの設定（３つの設定のいずれか一つを True にする）                                                              |
-| not_emacs_target                                               | Emacs のキーバインドに“したくない”アプリケーションソフトを指定する                                             |
-| ime_target                                                     | IME の切り替え“のみをしたい”アプリケーションソフトを指定する                                                   |
-| side_of_ctrl_key                                               | 左右どちらの Ctrlキーを使うかを指定する                                                                          |
-| use_esc_as_meta                                                | Escキーを Metaキーとして使うかどうかを指定する                                                                   |
-| use_emacs_ime_mode                                             | Emacs日本語入力モードを使うかどうかを指定する                                                                    |
-| toggle_input_method_key                                        | IME をトグルで切り替えるキーを指定する                                                                           |
-| set_input_method_key                                           | IME を切り替えるキーの組み合わせ（disable、enable の順）を指定する                                               |
-| use_vscode_terminal_key_direct_input                           | VSCode の Terminal内 で ４つのキー（Ctrl+k、Ctrl+r、Ctrl+s、Ctrl+y）のダイレクト入力機能を使うかどうかを指定する |
-|----------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------|
+|--------------------------------------+------------------------------------------------------------------------------------------------------------------|
+| Configuration Parameter              | Description                                                                                                      |
+|--------------------------------------+------------------------------------------------------------------------------------------------------------------|
+| ime                                  | 利用している IME を指定する                                                                                      |
+| not_emacs_target                     | Emacs のキーバインドに“したくない”アプリケーションソフトを指定する                                             |
+| ime_target                           | IME の切り替え“のみをしたい”アプリケーションソフトを指定する                                                   |
+| side_of_ctrl_key                     | 左右どちらの Ctrlキーを使うかを指定する                                                                          |
+| use_esc_as_meta                      | Escキーを Metaキーとして使うかどうかを指定する                                                                   |
+| use_emacs_ime_mode                   | Emacs日本語入力モードを使うかどうかを指定する                                                                    |
+| toggle_input_method_key              | IME をトグルで切り替えるキーを指定する                                                                           |
+| set_input_method_key                 | IME を切り替えるキーの組み合わせ（disable、enable の順）を指定する                                               |
+| use_vscode_terminal_key_direct_input | VSCode の Terminal内 で ４つのキー（Ctrl+k、Ctrl+r、Ctrl+s、Ctrl+y）のダイレクト入力機能を使うかどうかを指定する |
+|--------------------------------------+------------------------------------------------------------------------------------------------------------------|
 
 ※ 1) で Caps Lock に右 Control キーを割り当てた場合には、side_of_ctrl_key を "R" に
 変更する必要があります。この場合、左 Control キーは従来どおり Windows ショートカット用
@@ -185,15 +180,15 @@ VSCode については、一般的な Emacs キーバインドの他に次のキ
 | Ctrl+Alt+s  | skip_to_next_like_this        | Move Last Selection To Next Find Match |
 |-------------+-------------------------------+----------------------------------------|
 
-VSCode に Center Editor Window Extension、vcode-dired Extension、Search in Current File を
-インストールすることにより、次のキーバインドも利用が可能となります。利用するための設定は
-_config_personal.py の中に記載しています。
+VSCode に vcode-dired Extension、Center Editor Window Extension、Search in Current File を
+インストールし、Fakeymacs の vscode-extensions Extension を有効にすることにより、
+次のキーバインドも利用可能となります。
 
 |--------------+--------------------+------------------------|
 | Key-binding  | Fakeymacs Function | VSCode Command         |
 |--------------+--------------------+------------------------|
-| Ctrl+l       | recenter           | Center Editor Window   |
 | Ctl+x d      | dired              | Open dired buffer      |
+| Ctrl+l       | recenter           | Center Editor Window   |
 | Ctl+x Ctrl+o | occor              | Search in Current File |
 |--------------+--------------------+------------------------|
 
@@ -204,7 +199,7 @@ _config_personal.py の中に記載しています。
 ことにより、ショートカットキーが割り当てられていない VSCode のコマンドでも、Fakeymacs から
 実行できるようにしています。
 
-※ vscodeExecuteCommand 関数内では日本語入力モードの切り替えを行っているのですが、Google 
+※ vscodeExecuteCommand 関数内では日本語入力モードの切り替えを行っているのですが、Google
 日本語入力を利用して入力モードのポップアップを表示する設定にしている場合、このポップアップが
 何度も表示される症状が発生するようです。このため、ポップアップを非表示にする設定にしてご利用
 ください。（https://memotora.com/2014/10/05/google-ime-pop-up-setting/）

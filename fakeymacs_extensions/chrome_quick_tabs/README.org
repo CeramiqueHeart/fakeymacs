@@ -1,0 +1,46 @@
+#+STARTUP: showall indent
+
+* Fakeymacs extension
+
+** ■ Chrome 系ブラウザで Ctrl-x C-b を入力した際、Chrome の拡張機能 Quick Tabs を起動する
+
+Chrome 系ブラウザで Ctrl-x C-b を入力した時に、Chrome の拡張機能 Quick Tabs を起動する
+Fakeymacs の拡張機能です。
+
+Chrome の拡張機能 Quick Tabs については、次のページを参照してください。
+
+- https://loumo.jp/archives/22355
+- https://nldot.info/quicktabs-chrome/
+
+次の辺りの設定をすると、シンプルな表示になり、使い勝手もよくなります。
+
+- Display options: で Show URLs を OFF にする
+- Search type: で Perform RegEx Search を選択する
+- Search options: で Keep last searched string in search box を OFF にする
+- Search options: で Always search URLs (even when not shown) を ON にする
+- Custom CSS でサンプル設定に従い、表示する幅を 2000px くらいにする
+
+検索文字列の後にスペースを3つ入力することにより、履歴を検索することもできます。
+
+*** コンフィグレーションパラメータ
+
+|-------------------------+----------------------------------------------------|
+| Configuration parameter | Description                                        |
+|-------------------------+----------------------------------------------------|
+| chrome_list             | 本機能を適用するブラウザのプログラム名称を指定する |
+|-------------------------+----------------------------------------------------|
+
+*** キーバインド
+
+|-----------+--------------+-------------|
+| Keybind   | Function     | Description |
+|-----------+--------------+-------------|
+| Ctl-x C-b | list_buffers |             |
+|-----------+--------------+-------------|
+
+*** 注意事項
+
+Quick Tabs を起動するためのショートカットキーの初期値は Ctrl+e なのですが、Quick Tabs
+をインストールしてもこのショートカットキーは有効にならないようです。
+拡張機能のキーボードショートカットの機能で再登録すると有効になるようですので、お試し
+ください。

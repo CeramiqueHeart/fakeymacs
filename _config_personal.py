@@ -26,10 +26,11 @@ keymap.setFont("ＭＳ ゴシック", 12)
 ####################################################################################################
 # [section-options] --------------------------------------------------------------------------------
 
-# IMEの設定（３つの設定のいずれか一つを True にする）
-fc.use_old_Microsoft_IME = True
-fc.use_new_Microsoft_IME = False
-fc.use_Google_IME = False
+# IMEの設定（次の設定のいずれかを有効にする）
+fc.ime = "old_Microsoft_IME"
+# fc.ime = "new_Microsoft_IME"
+# fc.ime = "Google_IME"
+# fc.ime = None
 
 ####################################################################################################
 ## 基本設定
@@ -75,6 +76,15 @@ fc.emacs_exclusion_key  = {"chrome.exe"       : ["C-l", "C-t"],
 # （True（Metaキーとして使う）に設定されている場合、ESC の二回押下で ESC が入力されます）
 # fc.use_esc_as_meta = True
 
+# Emacs日本語入力モードを使うかどうかを指定する（True: 使う、False: 使わない）
+fc.use_emacs_ime_mode = True
+
+# IME をトグルで切り替えるキーを指定する（複数指定可）
+fc.toggle_input_method_key = []
+fc.toggle_input_method_key += ["C-Yen"]
+fc.toggle_input_method_key += ["C-o"]
+# fc.toggle_input_method_key += ["O-LAlt"]
+
 #---------------------------------------------------------------------------------------------------
 # IME を切り替えるキーの組み合わせ（disable、enable の順）を指定する（複数指定可）
 # （toggle_input_method_key のキー設定より優先します）
@@ -105,64 +115,6 @@ fc.set_input_method_key += [["(29)", "(28)"]]
 # fc.application_key = "W-m"
 
 # [section-base-2] ---------------------------------------------------------------------------------
-
-#---------------------------------------------------------------------------------------------------
-# VSCode で Extension のインストールが必要な機能は、個人設定ファイルで設定する
-
-if 0:
-    # VSCode に vscode-dired Extension をインストールしてお使いください
-    # （Ctrl+x f に設定されているキーバインドは、Ctrl+x（Cut）の機能とバッティングするので、削除して
-    #   ください（Open Keyboard Shortcuts コマンドで削除可能です）)
-
-    def dired(func=dired):
-        if checkWindow("Code.exe", "Chrome_WidgetWin_1"): # VSCode
-            # VSCode Command : Open dired buffer
-            vscodeExecuteCommand("Op-di-bu")
-        else:
-            func()
-
-    define_key(keymap_emacs, "Ctl-x d", reset_search(reset_undo(reset_counter(reset_mark(dired)))))
-
-if 0:
-    # VSCode に Center Editor Window Extension をインストールしてお使いください
-
-    def recenter(func=recenter):
-        if checkWindow("Code.exe", "Chrome_WidgetWin_1"): # VSCode
-            # VSCode Command : Center Editor Window
-            self_insert_command("C-l")()
-        else:
-            func()
-
-    define_key(keymap_emacs, "C-l", reset_search(reset_undo(reset_counter(recenter))))
-
-if 0:
-    # VSCode に Search in Current File Extension をインストールしてお使いください
-    # （アクティビティバーの SEARCH アイコンをパネルのバーにドラッグで持っていくと、検索結果が
-    #   パネルに表示されるようになり、使いやすくなります）
-
-    def occur():
-        if checkWindow("Code.exe", "Chrome_WidgetWin_1"): # VSCode
-            # VSCode Command : Search in Current File
-            vscodeExecuteCommand("Se-in-Cu-Fi")
-
-    define_key(keymap_emacs, "Ctl-x C-o", reset_search(reset_undo(reset_counter(reset_mark(occur)))))
-#---------------------------------------------------------------------------------------------------
-
-#---------------------------------------------------------------------------------------------------
-# Everything プログラムを起動するキーを指定する
-
-if 0:
-    # Everything を起動するキーを指定する
-    everything_key = "C-A-v"
-
-    # Everything プログラムを指定する
-    everything_name = r"C:\Program Files\Everything\everything.exe"
-
-    def everything():
-        keymap.ShellExecuteCommand(None, everything_name, "", "")()
-
-    define_key(keymap_global, everything_key, everything)
-#---------------------------------------------------------------------------------------------------
 
 ####################################################################################################
 ## クリップボードリストの設定
@@ -244,11 +196,39 @@ fc.lancherList_listers = [
 ####################################################################################################
 # [section-extensions] -----------------------------------------------------------------------------
 
-# C-Enter に F2（編集モード移行）を割り当てる
+# VSCode で Extension のインストールが必要な機能の設定を行う
+# fc.vscode_dired = True
+# fc.vscode_recenter = True
+# fc.vscode_occur = True
+# exec(readConfigExtension(r"vscode_extensions/config.py"), dict(globals(), **locals()))
+
+# Everything を起動するキーを指定する
+# exec(readConfigExtension(r"everything/config.py"), dict(globals(), **locals()))
+
+# ブラウザ向けのキーの設定を行う
+# exec(readConfigExtension(r"browser_key/config.py"), dict(globals(), **locals()))
+
+# Chrome 系ブラウザで Ctrl-x C-b を入力した際、Chrome の拡張機能 Quick Tabs を起動する
+# exec(readConfigExtension(r"chrome_quick_tabs/config.py"), dict(globals(), **locals()))
+
+# Emacs の shell-command-on-region の機能をサポートする
+# fc.Linux_tool = "WSL"
+# fc.Linux_tool = "MSYS2"
+# fc.Linux_tool = "Cygwin"
+# fc.Linux_tool = "BusyBox"
+# exec(readConfigExtension(r"shell_command_on_region\config.py"), dict(globals(), **locals()))
+
+# 指定したアプリケーションソフトに F2（編集モード移行）を割り当てるキーを設定する
 exec(readConfigExtension(r"edit_mode\config.py"), dict(globals(), **locals()))
 
 # Emacs の場合、IME 切り替え用のキーを C-\ に置き換える
 # exec(readConfigExtension(r"real_emacs\config.py"), dict(globals(), **locals()))
 
 # 英語キーボード設定をした OS 上で、日本語キーボードを利用する場合の切り替えを行う
+# fc.change_keyboard_startup = "US"
+# fc.change_keyboard_startup = "JP"
 # exec(readConfigExtension(r"change_keyboard\config.py"), dict(globals(), **locals()))
+
+# クリップボードに格納したファイルもしくはフォルダのパスを emacsclient で開く
+# fc.emacsclient_name = r"<emacsclient プログラムをインストールしている Windows のパス>\wslclient-n.exe"
+# exec(readConfigExtension(r"emacsclient/config.py"), dict(globals(), **locals()))
