@@ -27,9 +27,9 @@ keymap.setFont("ＭＳ ゴシック", 12)
 # [section-options] --------------------------------------------------------------------------------
 
 # IMEの設定（次の設定のいずれかを有効にする）
-fc.ime = "old_Microsoft_IME"
+# fc.ime = "old_Microsoft_IME"
 # fc.ime = "new_Microsoft_IME"
-# fc.ime = "Google_IME"
+fc.ime = "Google_IME"
 # fc.ime = None
 
 ####################################################################################################
@@ -77,7 +77,7 @@ fc.emacs_exclusion_key  = {"chrome.exe"       : ["C-l", "C-t"],
 # fc.use_esc_as_meta = True
 
 # Emacs日本語入力モードを使うかどうかを指定する（True: 使う、False: 使わない）
-fc.use_emacs_ime_mode = True
+fc.use_emacs_ime_mode = False
 
 # IME をトグルで切り替えるキーを指定する（複数指定可）
 fc.toggle_input_method_key = []

@@ -221,9 +221,9 @@ def configure(keymap):
     ####################################################################################################
 
     # IMEの設定（次の設定のいずれかを有効にする）
-    # fc.ime = "old_Microsoft_IME"
+    fc.ime = "old_Microsoft_IME"
     # fc.ime = "new_Microsoft_IME"
-    fc.ime = "Google_IME"
+    # fc.ime = "Google_IME"
     # fc.ime = None
 
     # 個人設定ファイルのセクション [section-options] を読み込んで実行する
@@ -362,8 +362,7 @@ def configure(keymap):
     fc.scroll_key = ["M-v", "C-v"]
 
     # Emacs日本語入力モードを使うかどうかを指定する（True: 使う、False: 使わない）
-    #fc.use_emacs_ime_mode = True
-    fc.use_emacs_ime_mode = False
+    fc.use_emacs_ime_mode = True
 
     # Emacs日本語入力モードが有効なときに表示するバルーンメッセージを指定する
     fc.emacs_ime_mode_balloon_message = None
