@@ -14,7 +14,7 @@ except:
 
 def list_buffers(window_keymap, keys):
     # 新規に実行する関数を定義する
-    func1 = reset_search(reset_undo(reset_counter(reset_mark(self_insert_command3("C-e")))))
+    func1 = reset_search(reset_undo(reset_counter(reset_mark(self_insert_command3("A-e")))))
 
     # 以前に定義した関数を抽出する
     func2 = getKeyCommand(window_keymap, keys)
