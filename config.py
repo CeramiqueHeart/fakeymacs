@@ -5,7 +5,7 @@
 ## Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）
 ##
 
-fakeymacs_version = "20201204_01"
+fakeymacs_version = "20201217_01"
 
 # このスクリプトは、Keyhac for Windows ver 1.82 以降で動作します。
 #   https://sites.google.com/site/craftware/keyhac-ja
@@ -334,8 +334,7 @@ def configure(keymap):
 
     # clipboard 監視の対象外とするアプリケーションソフトを指定する
     fc.not_clipboard_target = []
-    ## Microsoft Excel 2019 以降の Excel では、次の設定は不要のようです
-    fc.not_clipboard_target += ["EXCEL.EXE"]             # Excel
+    fc.not_clipboard_target += ["EXCEL.EXE"] # Excel
 
     # 左右どちらの Ctrlキーを使うかを指定する（"L": 左、"R": 右）
     fc.side_of_ctrl_key = "L"
@@ -1415,7 +1414,7 @@ def configure(keymap):
     def define_key2(window_keymap, keys, command):
         define_key(window_keymap, keys, command, skip_check=False)
 
-    def keyFunc(window_keymap, keys):
+    def getKeyCommand(window_keymap, keys):
         try:
             keys_list = kbd(keys)[-1]
             if len(keys_list) == 1:
@@ -1923,7 +1922,7 @@ def configure(keymap):
             disable_input_method()
 
         def ei_enable_input_method2(key, window_keymap):
-            func = keyFunc(window_keymap, key)
+            func = getKeyCommand(window_keymap, key)
             if func is None:
                 if key.startswith("O-"):
                     func = ei_record_func(self_insert_command("(28)")) # <変換> キーを発行
@@ -1938,7 +1937,7 @@ def configure(keymap):
             return _func
 
         def ei_disable_input_method2(key, window_keymap):
-            func = keyFunc(window_keymap, key)
+            func = getKeyCommand(window_keymap, key)
             if func is None:
                 if key.startswith("O-"):
                     func = ei_record_func(self_insert_command("(29)")) # <無変換> キーを発行
