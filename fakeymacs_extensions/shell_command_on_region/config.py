@@ -6,13 +6,20 @@
 
 try:
     # 設定されているか？
-    fc.Linux_tool
+    fc.unix_tool
 except:
-    # Linux コマンドを起動するために利用する Linux ツールを指定する
-    fc.Linux_tool = "WSL"
-    # fc.Linux_tool = "MSYS2"
-    # fc.Linux_tool = "Cygwin"
-    # fc.Linux_tool = "BusyBox"
+    # Unix コマンドを起動するために利用する Unix ツールを指定する
+    fc.unix_tool = "WSL"
+    # fc.unix_tool = "MSYS2"
+    # fc.unix_tool = "Cygwin"
+    # fc.unix_tool = "BusyBox"
+
+try:
+    # 設定されているか？
+    fc.bash_options
+except:
+    # Bash のオプション（-c 以外）を指定する
+    fc.bash_options = ["-l"]
 
 try:
     # 設定されているか？
@@ -39,10 +46,12 @@ except:
 import subprocess
 
 def shell_command_inputbox():
+    global replace_region
+
     if fakeymacs.is_universal_argument:
-        fakeymacs.replace_region = True
+        replace_region = True
     else:
-        fakeymacs.replace_region = False
+        replace_region = False
 
     # inputbox_command = dataPath() + r"\fakeymacs_extensions\shell_command_on_region\inputbox.ahk"
     inputbox_command = dataPath() + r"\fakeymacs_extensions\shell_command_on_region\inputbox.exe"
@@ -61,34 +70,43 @@ def shell_command_on_region():
 
             env = dict(os.environ)
 
-            # 以降で実行するコマンドは、bash に -l オプションを付け、その配下で実行するようにしています。
-            # このため、bash を起動する環境の .bash_profile に多くの設定を記入していると、コマンドの
-            # 実行が遅かったり、コマンドが正しくフィルタとして機能しなかったりする場合があります。
+            # bash に -l オプションを付け実行する場合、bash を起動する環境の .bash_profile に多くの
+            # 設定を記入していると、コマンドの実行が遅かったり、コマンドが正しくフィルタとして機能
+            # しなかったりする場合があります。
             # このようなときに .bash_profile 内の設定をコントロール（スキップ）できるようにするため、
             # FAKEYMACS 環境変数を設定しています。
             env["FAKEYMACS"] = "1"
 
-            if fc.Linux_tool == "WSL":
-                command = [r"C:\WINDOWS\SysNative\wsl.exe", "bash", "-l", "-c"]
+            bash_options = []
+            if fc.bash_options:
+                bash_options += fc.bash_options
+            bash_options += ["-c"]
+
+            if fc.unix_tool == "WSL":
+                command = [r"C:\WINDOWS\SysNative\wsl.exe", "bash"]
+                command += bash_options
                 command += [r"cd; tr -d '\r' | " + re.sub(r"(\$)", r"\\\1", shell_command)]
                 env["LANG"] = "ja_JP.UTF8"
                 env["WSLENV"] = "FAKEYMACS:LANG"
                 encoding = "utf-8"
 
-            elif fc.Linux_tool == "MSYS2":
-                command = [fc.MSYS2_path + r"\usr\bin\bash.exe", "-l", "-c"]
+            elif fc.unix_tool == "MSYS2":
+                command = [fc.MSYS2_path + r"\usr\bin\bash.exe"]
+                command += bash_options
                 command += [shell_command]
                 env["LANG"] = "ja_JP.UTF8"
                 encoding = "utf-8"
 
-            elif fc.Linux_tool == "Cygwin":
-                command = [fc.Cygwin_path + r"\bin\bash.exe", "-l", "-c"]
+            elif fc.unix_tool == "Cygwin":
+                command = [fc.Cygwin_path + r"\bin\bash.exe"]
+                command += bash_options
                 command += [r"tr -d '\r' | " + shell_command]
                 env["LANG"] = "ja_JP.UTF8"
                 encoding = "utf-8"
 
-            elif fc.Linux_tool == "BusyBox":
-                command = [fc.BusyBox_path + r"\busybox64.exe", "bash", "-l", "-c"]
+            elif fc.unix_tool == "BusyBox":
+                command = [fc.BusyBox_path + r"\busybox64.exe", "bash"]
+                command += bash_options
                 command += [shell_command]
                 encoding = "cp932"
 
@@ -124,7 +142,7 @@ def shell_command_on_region():
             if keymap.getWindow().getProcessName() in fc.not_clipboard_target:
                 keymap.clipboard_history._push(stdout_text)
 
-            if fakeymacs.replace_region:
+            if replace_region:
                 # delay() のコールでは yank に失敗することがあるため、delayedCall() 経由で実行する
                 keymap.delayedCall(yank, 30)
         else:
@@ -133,5 +151,5 @@ def shell_command_on_region():
     # キーフックの中で時間のかかる処理を実行できないので、delayedCall() を使って遅延実行する
     keymap.delayedCall(executeShellCommand, 100)
 
-define_key(keymap_emacs, "M-S-BackSlash", reset_search(reset_undo(reset_counter(reset_mark(shell_command_inputbox)))))
-define_key(keymap_emacs, "LC-S-BackSlash", reset_search(reset_undo(reset_counter(reset_mark(shell_command_on_region)))))
+define_key(keymap_emacs, "M-|", reset_search(reset_undo(reset_counter(reset_mark(shell_command_inputbox)))))
+define_key(keymap_emacs, "LC-S-" + vkToStr(VK_F12), reset_search(reset_undo(reset_counter(reset_mark(shell_command_on_region)))))
