@@ -21,11 +21,14 @@ VSCode Extension 用のキーの設定を行う拡張機能です。
 | vscode_input_sequence   | vscode-input-sequence を利用するかどうかを指定する                     |
 | vscode_insert_numbers   | Insert Numbers を利用するかどうかを指定する                            |
 | vscode_keyboard_macro   | Keyboard Macro Beta を利用するかどうかを指定する                       |
+| vscode_filter_text      | Filter Text を利用するかどうかを指定する                               |
 |-------------------------+------------------------------------------------------------------------|
 
 *** キーバインド
 
 **** ● vscode_dired
+
+- https://marketplace.visualstudio.com/items?itemName=rrudi.vscode-dired
 
 |---------+----------+-------------------+-------------|
 | Keybind | Function | VSCode Command    | Description |
@@ -35,6 +38,8 @@ VSCode Extension 用のキーの設定を行う拡張機能です。
 
 **** ● vscode_recenter
 
+- https://marketplace.visualstudio.com/items?itemName=kaiwood.center-editor-window
+
 |---------+----------+----------------------+-------------|
 | Keybind | Function | VSCode Command       | Description |
 |---------+----------+----------------------+-------------|
@@ -43,6 +48,8 @@ VSCode Extension 用のキーの設定を行う拡張機能です。
 
 **** ● vscode_recenter2
 
+- https://marketplace.visualstudio.com/items?itemName=yeannylam.recenter-top-bottom
+
 |---------+-----------+---------------------+-------------|
 | Keybind | Function  | VSCode Command      | Description |
 |---------+-----------+---------------------+-------------|
@@ -50,6 +57,8 @@ VSCode Extension 用のキーの設定を行う拡張機能です。
 |---------+-----------+---------------------+-------------|
 
 **** ● vscode_occur
+
+- https://marketplace.visualstudio.com/items?itemName=shibayu36.search-in-current-file
 
 |-----------+----------+------------------------+-------------|
 | Keybind   | Function | VSCode Command         | Description |
