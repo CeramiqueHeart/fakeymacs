@@ -1,7 +1,7 @@
 ﻿# -*- mode: python; coding: utf-8-with-signature-dos -*-
 
 ####################################################################################################
-## ブラウザをポップアップしてから C-l、C-t を入力するキーを設定する
+## ブラウザをポップアップしてから、ブラウザのショートカットキーを入力するキーを設定する
 ####################################################################################################
 
 try:
@@ -15,50 +15,57 @@ except:
 
 try:
     # 設定されているか？
+    fc.browser_url
+except:
+    # ブラウザが起動していない場合に開く URL を指定する
+    # fc.browser_url = r"https://www.google.com/"
+    fc.browser_url = r"https://"
+
+try:
+    # 設定されているか？
     fc.browser_key1
 except:
-    # アドレスバーに移動するキーを指定する（IME は OFF）
+    # ブラウザをポップアップし、アドレスバーに移動するキーを指定する（IME は OFF）
     fc.browser_key1 = "C-A-l"
 
 try:
     # 設定されているか？
     fc.browser_key2
 except:
-    # 新しいタブを開いてそのタブのアドレスバーに移動するキーを指定する（IME は OFF）
+    # ブラウザをポップアップし、新しいタブを開くキーを指定する（IME は OFF）
     fc.browser_key2 = "C-A-t"
 
 try:
     # 設定されているか？
     fc.browser_key3
 except:
-    # アドレスバーに移動するキーを指定する（IME は ON）
-    fc.browser_key3 = "C-A-i"
+    # ブラウザをポップアップし、新しいウィンドウを開くキーを指定する（IME は OFF）
+    fc.browser_key3 = "C-A-o" # C-A-n は VSCode Extension で利用しているため使わない
 
-# ブラウザをポップアップしてから指定したキーを実行する。
-
-def browser_popup(key, ime_status):
+# ブラウザをポップアップしてから指定したキーを実行する
+def browser_popup(key, ime_status, browser_list=fc.browser_list):
     def _func():
-        for window in getWindowList():
-            if window.getProcessName() in fc.browser_list:
+        def _inputKey():
+            escape() # 検索状態になっていた場合に Esc で解除する
+            self_insert_command(key)()
+            setImeStatus(ime_status)
 
-                # thunderbird から本コマンドを実行した際、ウィンドウフォーカスが適切に
-                # 移動しない場合がある。その対策。（何かのキーを押下すると良いようだ。）
-                if keymap.getWindow().getProcessName() == "thunderbird.exe":
-                    self_insert_command("Shift")()
-
-                popWindow(window)()
-                delay()
-                escape() # 検索状態になっていた場合に Esc で解除する
-                self_insert_command(key)()
-                keymap.delayedCall(lambda: setImeStatus(ime_status), 100)
-                return
-
-        # fc.browser_list に定義するブラウザが起動していない場合、fc.browser_list の最初
-        # に定義するブラウザを起動する
-        keymap.ShellExecuteCommand(None, fc.browser_list[0], "", "")()
-
+        if keymap.getWindow().getProcessName() in browser_list:
+            _inputKey()
+        else:
+            for window in getWindowList()[1:]:
+                if window.getProcessName() in browser_list:
+                    popWindow(window)()
+                    keymap.delayedCall(_inputKey, 50)
+                    break
+            else:
+                # browser_list に設定されているブラウザが起動していない場合、browser_url を開く
+                keymap.ShellExecuteCommand(None, fc.browser_url, "", "")()
     return _func
 
 define_key(keymap_global, fc.browser_key1, browser_popup("C-l", 0))
 define_key(keymap_global, fc.browser_key2, browser_popup("C-t", 0))
-define_key(keymap_global, fc.browser_key3, browser_popup("C-l", 1))
+define_key(keymap_global, fc.browser_key3, browser_popup("C-n", 0))
+
+## config_personal.py ファイルの読み込み
+exec(readConfigExtension(r"browser_key\config_personal.py", msg=False), dict(globals(), **locals()))
