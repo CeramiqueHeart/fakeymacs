@@ -94,6 +94,7 @@ fc.emacs_exclusion_key  = {"chrome.exe"       : ["C-l", "C-t"],
                            }
 
 # 左右どちらの Ctrlキーを使うかを指定する（"L": 左、"R": 右）
+fc.side_of_ctrl_key = "L"
 # fc.side_of_ctrl_key = "R"
 
 # Escキーを Metaキーとして使うかどうかを指定する（True: 使う、False: 使わない）

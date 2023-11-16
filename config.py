@@ -399,8 +399,8 @@ def configure(keymap):
     #---------------------------------------------------------------------------------------------------
     # Emacs日本語入力モードを利用する際に、IME のショートカットを置き換えるキーの組み合わせ
     # （置き換え先、置き換え元）を指定する
-    # （「ことえり」のキーバインドを利用するための設定例です。Google日本語入力で「ことえり」の
-    #   キー設定になっている場合には不要ですが、設定を行っていても問題はありません。）
+    # （Microsoft IME で「ことえり」のキーバインドを利用するための設定例です。Google日本語入力で
+    #   「ことえり」のキー設定になっている場合には不要ですが、設定を行っていても問題はありません。）
     fc.emacs_ime_mode_key = []
     fc.emacs_ime_mode_key += [["C-i", "S-Left"],  # 文節を縮める
                               ["C-o", "S-Right"], # 文節を伸ばす
@@ -2144,6 +2144,7 @@ def configure(keymap):
     define_key(keymap_emacs, "Ctl-x C-c", reset_search(reset_undo(reset_counter(reset_mark(kill_emacs)))))
     define_key(keymap_emacs, "M-!",       reset_search(reset_undo(reset_counter(reset_mark(shell_command)))))
 
+    ## 「タブ」のキー設定
     if fc.use_ctrl_i_as_tab:
         define_key(keymap_emacs, "C-i", reset_undo(reset_counter(reset_mark(repeat(indent_for_tab_command)))))
 
