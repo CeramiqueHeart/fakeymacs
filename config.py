@@ -2131,8 +2131,8 @@ def configure(keymap):
     define_key(keymap_base, "(240)",   toggle_input_method) # CapsLock キー
     define_key(keymap_base, "S-(240)", toggle_input_method) # CapsLock キー
     
-    define_key(keymap_base, "C-o C-o", enable_input_method)
-    define_key(keymap_base, "C-o C-i", disable_input_method)
+    define_key(keymap_emacs, "C-o C-o", enable_input_method)
+    define_key(keymap_emacs, "C-o C-i", disable_input_method)
 
 
     ## 「ファイル操作」のキー設定
