@@ -2130,6 +2130,10 @@ def configure(keymap):
     define_key(keymap_base, "C-(244)", toggle_input_method) # C-<半角／全角> キー
     define_key(keymap_base, "(240)",   toggle_input_method) # CapsLock キー
     define_key(keymap_base, "S-(240)", toggle_input_method) # CapsLock キー
+    
+    define_key(keymap_emacs, "C-o C-o", enable_input_method)
+    define_key(keymap_emacs, "C-o C-i", disable_input_method)
+
 
     ## 「ファイル操作」のキー設定
     define_key(keymap_emacs, "Ctl-x C-f", reset_search(reset_undo(reset_counter(reset_mark(find_file)))))
