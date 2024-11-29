@@ -1,0 +1,215 @@
+#+STARTUP: showall indent
+
+* Fakeymacs extension
+
+** ■ SpaceFN を実現する設定を行う
+
+SpaceFN を実現する設定を行う拡張機能です。
+
+*** コンフィグレーションパラメータ
+
+|----------------------------------+----------------------------------------------------------------------------------------------------|
+| Configuration parameter          | Description                                                                                        |
+|----------------------------------+----------------------------------------------------------------------------------------------------|
+| fc.space_fn_key                  | SpaceFN 用のモディファイアキーを指定する                                                           |
+| fc.space_fn_window_keymap_list   | SpaceFN を適用するキーマップを指定する                                                             |
+| fc.space_fn_use_oneshot_function | SpaceFN 用のモディファイアキーの単押しで、元のキーの機能を利用するかどうかを指定する               |
+| fc.space_fn_delay_seconds        | SpaceFN 用のモディファイアキーが押下されてから、SpacdFN の機能が働くようになるまでの秒数を指定する |
+|----------------------------------+----------------------------------------------------------------------------------------------------|
+
+*** 関数（Functions）
+
+**** ■ define_key_fn
+
+キーマップに SpaceFN 用のキーを定義する
+
+***** Function
+
+#+BEGIN_EXAMPLE
+def define_key_fn(window_keymap, keys, command, space_fn_key_output=False):
+#+END_EXAMPLE
+
+***** Parameters
+
+|---------------------+----------------------------------------------------------------------------------------------|
+| Parameter           | Description                                                                                  |
+|---------------------+----------------------------------------------------------------------------------------------|
+| window_keymap       | WindowKeymapオブジェクト                                                                     |
+| keys                | SpaceFN 用に設定するキー（keys の初めのキーには U0- を含むこと）                             |
+| command             | 実行するコマンド（関数）                                                                     |
+| space_fn_key_output | command を実行する前に、fc.space_fn_key 変数に設定しているキーの出力をするかどうかを指定する |
+|---------------------+----------------------------------------------------------------------------------------------|
+
+***** Returns
+
+- 無し
+
+**** ■ replicate_key
+
+SpaceFN 用にキーを複製する
+
+***** Function
+
+#+BEGIN_EXAMPLE
+def replicate_key(window_keymap, key, original_key):
+#+END_EXAMPLE
+
+***** Parameters
+
+|---------------+------------------------------------------------------------------|
+| Parameter     | Description                                                      |
+|---------------+------------------------------------------------------------------|
+| window_keymap | WindowKeymapオブジェクト                                         |
+| key           | SpaceFN 用に設定するキー（key の初めのキーには U0- を含むこと）  |
+| original_key  | 複製する元のキー                                                 |
+|---------------+------------------------------------------------------------------|
+
+***** Returns
+
+- 無し
+
+*** サンプル設定ファイル（_config_personal-1.py、_config_personal-2.py）で設定しているキーバインド
+
+このサンプル設定は、次のサイトの設定例を参考としています。
+
+- https://geekhack.org/index.php?topic=51069.0
+
+このサイトの設定例の内、Esc を割り当てている e キーの設定のみ除外しています。
+（keymap_emacs キーマップでは、Esc をマルチストロークキー（Meta キー）として設定する場合があります。
+この場合、複数のキーマップに渡るキーの置き換えが単純ではなくなるため、サンプル設定では除外しています。）
+
+**** ● SpaceFN 主要キーの設定
+
+|-------------+-----------------+--------------------------|
+| Keybind     | replacement key | Description              |
+|-------------+-----------------+--------------------------|
+| U0-<m>-j    | <m>-Left        |                          |
+| U0-<m>-l    | <m>-Right       |                          |
+| U0-<m>-i    | <m>-Up          |                          |
+| U0-<m>-k    | <m>-Down        |                          |
+| U0-<m>-u    | <m>-Home        |                          |
+| U0-<m>-o    | <m>-End         |                          |
+| U0-<m>-h    | <m>-PageUp      |                          |
+| U0-<m>-n    | <m>-PageDown    |                          |
+| U0-<m>-Esc  | <m>-`           |                          |
+| U0-<m>-Back | <m>-Delete      |                          |
+| U0-<m>-p    | <m>-PrintScreen |                          |
+| U0-<m>-[    | <m>-ScrollLock  |                          |
+| U0-<m>-]    | <m>-Pause       |                          |
+| U0-<m>-\    | <m>-Insert      |                          |
+| U0-<m>-b    | <m>-Space       | スペースの連続入力が可能 |
+| U0-<m>-m    | <m>-`           |                          |
+| U0-<m>-,    | <m>-S-`         | S-` は ~                 |
+| U0-<m>-/    | <m>-Apps        |                          |
+|-------------+-----------------+--------------------------|
+
+- 「U0」は fc.space_fn_key 変数に設定した SpaceFN 用のモディファイアキー
+- _config_personal-1.py のサンプル設定では、<m> は <空>、<W->、<A->、<C->、<S-> の全ての組み合わせパターン
+- _config_personal-2.py のサンプル設定では、<m> は <空> か <S-> のどちらかのパターン
+
+**** ● ファンクションキーの設定
+
+|-----------------------------+-----------------+-------------|
+| Keybind                     | replacement key | Description |
+|-----------------------------+-----------------+-------------|
+| U0-<m>-1                    | <m>-F1          |             |
+| U0-<m>-2                    | <m>-F2          |             |
+| U0-<m>-3                    | <m>-F3          |             |
+| U0-<m>-4                    | <m>-F4          |             |
+| U0-<m>-5                    | <m>-F5          |             |
+| U0-<m>-6                    | <m>-F6          |             |
+| U0-<m>-7                    | <m>-F7          |             |
+| U0-<m>-8                    | <m>-F8          |             |
+| U0-<m>-9                    | <m>-F9          |             |
+| U0-<m>-0                    | <m>-F10         |             |
+| U0-<m>-<上記の右隣のキー>   | <m>-F11         |             |
+| U0-<m>-<上記の右隣のキー>   | <m>-F12         |             |
+| U0-<m>-S-1                  | <m>-F13         |             |
+| U0-<m>-S-2                  | <m>-F14         |             |
+| U0-<m>-S-3                  | <m>-F15         |             |
+| U0-<m>-S-4                  | <m>-F16         |             |
+| U0-<m>-S-5                  | <m>-F17         |             |
+| U0-<m>-S-6                  | <m>-F18         |             |
+| U0-<m>-S-7                  | <m>-F19         |             |
+| U0-<m>-S-8                  | <m>-F20         |             |
+| U0-<m>-S-9                  | <m>-F21         |             |
+| U0-<m>-S-0                  | <m>-F22         |             |
+| U0-<m>-S-<上記の右隣のキー> | <m>-F23         |             |
+| U0-<m>-S-<上記の右隣のキー> | <m>-F24         |             |
+|-----------------------------+-----------------+-------------|
+
+- 「U0」は fc.space_fn_key 変数に設定した SpaceFN 用のモディファイアキー
+- <m> は <空>、<W->、<A->、<C-> の全ての組み合わせパターン
+
+*** 留意事項
+
+● 本拡張機能では、SpaceFN 用のモディファイアキーとして User0（U0）を利用している他、内部で User3（U3）
+を利用しています。この２つのユーザモディファイアキーは利用者側で定義しないようにしてください。
+
+● 本拡張機能の SpaceFN は、SpaceFN キーへのマルチストロークキーの割当てに対応しています。
+SpaceFN キーをマルチストロークキーとして利用する場合のサンプルコードは、次のようなものとなります。
+（マルチストロークキーを設定する際も、define_key_fn 関数を利用していることにご留意ください。）
+
+#+BEGIN_EXAMPLE
+define_key_fn(keymap_emacs, "U0-d", keymap.defineMultiStrokeKeymap("U0-d"))
+
+def kill_line2(repeat):
+    move_beginning_of_line()
+    kill_line(repeat, kill_whole_line=True)
+
+# Vim の一行削除をイメージ
+define_key_fn(keymap_emacs, "U0-d U0-d",
+              lambda: keymap.delayedCall(
+                  reset_search(reset_undo(reset_counter(reset_mark(repeat3(kill_line2))))), 0))
+
+# 数引数のサポート
+for n in range(10):
+    define_key_fn(keymap_emacs, f"U0-{n}", digit2(n))
+#+END_EXAMPLE
+
+● 初期の設定では、SpaceFN を実現するベースの設定のみを行っています。SpaceFN のキー設定を
+行う際は、_config_personal_1.py もしくは _config_personal_2.py を 同じフォルダ上で
+config_personal.py という名称のファイルに複写し、そのファイルの中で行うようにしてください。
+
+● _config_personal_1.py は、Ctrl キー、Alt キー、Win キーとの組み合わせも含め、
+できるだけ完全なキーの複製を行う設定サンプルです。
+_config_personal_2.py は、Ctrl キー、Alt キー、Win キーとの組み合わせは行わない、
+キー単体と Shift キーの組み合わせのみのキーの複製を行う設定サンプルです。
+SpaceFN は、設定を行っていない SpaceFN のキーを入力すると、SpaceFN 用のモディファイア
+キーを除いたキーを発行する機能を持っています。そして 本拡張機能の SpaceFN の場合は、
+Emacs キーバインドの機能ではなく、Windows 本来のキーの機能が実行される仕様としています。
+この機能を活用することにより、SpaceFN 用のモディファイアキーを押してから Ctrl+x や Ctrl+c
+などのキーを入力すると、Windows 本来のキーの機能の「カット」や「コピー」などを利用する
+ことができます。
+HHKB US キーボードのように、Ctrl キーが一つしか持てない（CapsLock キーに RCtrl キーを
+割当てられない）キーボードを使って Fakeymacs の Emacs キーバインドを利用する場合、
+Windows 本来のキーの機能を利用するために Ctrl+q を前置する方法がありますが、本説明の
+機能を用いることで、同等の機能を実現することができます。
+_config_personal_2.py は、この機能を利用する場合の設定サンプルとしてご利用ください。
+
+● 本拡張機能の SpaceFN は、初期値として keymap_emacs と keymap_im のキーマップのみで
+動作するようにしています。
+fc.space_fn_window_keymap_list 変数の指定ににより、SpaceFN を適用するキーマップを
+変更することができます。
+
+● 本拡張機能の SpaceFN は、SpaceFN 用のモディファイアキーが押下されてから
+fc.space_fn_delay_seconds 変数に指定した秒数（初期値：0.15秒）後に次のキーが押された場合に、
+SpaceFN の機能が働くようにしています。
+fc.space_fn_delay_seconds 変数に指定した秒数より前に次のキーを押下した場合は、その押下した
+キーがそのまま入力される仕様としており、key rollover の対策としています。
+（本当は、SpaceFN 用のモディファイアキーとその次のキーが押下され、指定した短い時間以内に
+SpaceFN 用のモディファイアキーが離されたら押下したキーがそのまま入力される仕様にしたい
+のですが、現在のところそれを Keyhac で実現する方法が分かっておりません。TouchCursor は
+この方法で key rollover の対策を行っているようです。）
+
+● 本拡張機能の SpaceFN を利用する場合は、必ず SpaceFN 用のモディファイアキー（初期値は
+Space）から入力するようにしてください。本拡張機能の SpaceFN は、Shift や Ctrl などその他の
+モディファイアキーと組み合わせて利用することもできますが、その他のモディファイアキーを
+最初に入力した場合には、SpaceFN 用のモディファイアキーを入力した時点でキーの入力が
+確定する仕様としています。（これは、Ctrl+Space や Shift+Space を遅延なく入力できるように
+する対策です。）
+
+● 本拡張機能の特徴については、次の issue にも記載しています。
+
+- https://github.com/smzht/fakeymacs/issues/30
+

@@ -134,7 +134,7 @@ if fc.vscode_quick_select:
             ikey = key
             usjis_conv = True
 
-        define_key_v("C-A-k {}".format(key),
+        define_key_v(f"C-A-k {key}",
                      reset_rect(region(self_insert_command_v("C-k", ikey, usjis_conv=usjis_conv))))
 
 # --------------------------------------------------------------------------------------------------
@@ -168,11 +168,11 @@ if fc.vscode_keyboard_macro:
         self_insert_command("C-A-r")()
 
     def keyboard_macro_play():
-        def playMacro():
+        def _keyboard_macro_play():
             self_insert_command("C-A-p")()
             delay(0.1)
 
-        keymap.delayedCall(playMacro, 0)
+        keymap.delayedCall(_keyboard_macro_play, 0)
 
     define_key_v("Ctl-x (", keyboard_macro_start)
     define_key_v("Ctl-x )", keyboard_macro_stop)
