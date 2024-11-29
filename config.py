@@ -6,7 +6,7 @@
 ##  Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）
 #########################################################################
 
-fakeymacs_version = "20231116_01"
+fakeymacs_version = "20240621_01"
 
 import time
 import os.path
@@ -194,6 +194,7 @@ def configure(keymap):
                                "ubuntu1804.exe",         # WSL
                                "ubuntu2004.exe",         # WSL
                                "ubuntu2204.exe",         # WSL
+                               "ubuntu2404.exe",         # WSL
                                "debian.exe",             # WSL
                                "kali.exe",               # WSL
                                "SLES-12.exe",            # WSL
@@ -263,13 +264,13 @@ def configure(keymap):
     #   のような指定の他に、"M-f" や "Ctl-x d" などの指定も可能です。"M-g*" のようにワイルドカードも
     #   利用することができます。ワイルドカード文字をエスケープしたい場合は、[] で括ってください。）
     # （ここで指定したキーに新たに別のキー設定をしたいときには、define_key2 関数を利用してください）
-    fc.skip_settings_key    = {"keymap_base"      : ["*W-g"], # ベース Keymap
-                               "keymap_global"    : [],       # グローバル Keymap
-                               "keymap_emacs"     : [],       # Emacs キーバインド対象アプリ用 Keymap
-                               "keymap_ime"       : [],       # IME 切り替え専用アプリ用 Keymap
-                               "keymap_ei"        : [],       # Emacs 日本語入力モード用 Keymap
-                               "keymap_tsw"       : [],       # タスク切り替え画面用 Keymap
-                               "keymap_lw"        : [],       # リストウィンドウ用 Keymap
+    fc.skip_settings_key    = {"keymap_base"      : ["*W-g", "A-Tab"], # ベース Keymap
+                               "keymap_global"    : [], # グローバル Keymap
+                               "keymap_emacs"     : [], # Emacs キーバインド対象アプリ用 Keymap
+                               "keymap_ime"       : [], # IME 切り替え専用アプリ用 Keymap
+                               "keymap_ei"        : [], # Emacs 日本語入力モード用 Keymap
+                               "keymap_tsw"       : [], # タスク切り替え画面用 Keymap
+                               "keymap_lw"        : [], # リストウィンドウ用 Keymap
                                }
 
     # Emacs のキーバインドにするアプリケーションソフトで、Emacs キーバインドから除外するキーを指定する
@@ -331,6 +332,9 @@ def configure(keymap):
 
     # IME の状態を表示するバルーンメッセージの組み合わせ（英数入力、日本語入力）を指定する
     fc.ime_status_balloon_message = ["[A]", "[あ]"]
+
+    # ウィンドウが切り替わった際、IME の状態をリセット（英数入力）するかを指定する（True: する、False: しない）
+    fc.use_ime_status_reset = False
 
     # IME をトグルで切り替えるキーを指定する（複数指定可）
     fc.toggle_input_method_key = []
@@ -470,75 +474,19 @@ def configure(keymap):
     # （False に指定しても、C-u 数字キーで数引数を指定することができます）
     fc.use_ctrl_digit_key_for_digit_argument = False
 
-    # F1 から F12 を Alt+数字キー列として使うかを指定する（True: 使う、False: 使わない）
+    # 数字キー列が Alt キーと一緒に押されたとき、F1 から F12 のファンクションキーとして使うかを指定する
+    # （True: 使う、False: 使わない）
     fc.use_alt_digit_key_for_f1_to_f12 = False
-
-    # F13 から F24 を Alt-Shift+数字キー列として使うかを指定する（True: 使う、False: 使わない）
-    fc.use_alt_shift_digit_key_for_f13_to_f24 = False
 
     # 表示しているウィンドウの中で、一番最近までフォーカスがあったウィンドウに移動するキーを指定する
     fc.other_window_key = "A-o"
 
-    # アクティブウィンドウを切り替えるキーの組み合わせ（前、後 の順）を指定する（複数指定可）
-    # （A-Esc キーの動作とは異なり、仮想デスクトップを跨ぎ、最小化されていないウィンドウを順に切り替え
-    #   ます。初期設定は ["A-p", "A-n"] としていますが、Emacs の shell-mode のキーバインドなどと設定が
-    #   被る場合には、["A-S-p", "A-S-n"] などの異なる設定とするか、Emacs 側に次の設定を入れて、Emacs 側
-    #   のキーの設定を置き換えてご利用ください。
-    #     (define-key key-translation-map (kbd "M-S-p") (kbd "M-p"))
-    #     (define-key key-translation-map (kbd "M-S-n") (kbd "M-n"))
-    #  ）
-    fc.window_switching_key = []
-    fc.window_switching_key += [["A-p", "A-n"]]
-    # fc.window_switching_key += [["A-S-p", "A-S-n"]]
-    # fc.window_switching_key += [["A-Up", "A-Down"]]
-
-    # アクティブウィンドウをディスプレイ間で移動するキーの組み合わせ（前、後 の順）を指定する（複数指定可）
-    # （デフォルトキーは、["W-S-Left", "W-S-Right"]）
-    fc.window_movement_key_for_displays = []
-    fc.window_movement_key_for_displays += [[None, "W-o"]]
-    # fc.window_movement_key_for_displays += [[None, "A-S-o"]]
-
-    # デュアルディスプレイにそれぞれ表示されているウィンドウを入れ替えるキーを指定する
-    fc.transpose_windows_key = "W-t"
-
-    # ウィンドウを最大化、リストアするキーの組み合わせ（リストア、最大化 の順）を指定する（複数指定可）
-    # （マルチディスプレイでの最大化にも対応しています）
-    fc.window_maximize_key = []
-    fc.window_maximize_key += [["W-S-q", "W-q"]] # Windows ショートカットキーの W-q の機能は、W-s で代用可
-    # fc.window_maximize_key += [["W-S-m", "W-m"]] # Windows ショートカットキーの W-m の機能は、W-d で代用可
-    # fc.window_maximize_key += [["W-S-s", "W-s"]] # Windows ショートカットキーの W-s の機能は、W-q で代用可
-
-    # ウィンドウを最小化、リストアするキーの組み合わせ（リストア、最小化 の順）を指定する（複数指定可）
-    fc.window_minimize_key = []
-    fc.window_minimize_key += [["A-S-m", "A-m"]]
-
-    # 仮想デスクトップを切り替えるキーの組み合わせ（前、後 の順）を指定する（複数指定可）
-    # （仮想デスクトップを切り替えた際にフォーカスのあるウィンドウを適切に処理するため、設定するキーは
-    #   Win キーとの組み合わせとしてください）
-    # （デフォルトキーは、["W-C-Left", "W-C-Right"]）
-    fc.desktop_switching_key = []
-    fc.desktop_switching_key += [["W-b", "W-f"]]
-    # fc.desktop_switching_key += [["W-Left", "W-Right"]]
-
-    # アクティブウィンドウを仮想デスクトップ間で移動するキーの組み合わせ（前、後 の順）を指定する（複数指定可）
-    # （本機能を利用する場合は、次のページから SylphyHornPlus をインストールしてください。
-    #   ・https://github.com/hwtnb/SylphyHornPlusWin11/releases
-    #   SylphyHornPlus は、Microsoft Store からインストール可能な SylphyHorn の Fork で、Windows 11 の
-    #   対応など、改良が加えられたものとなっています。）
-    # （アクティブウィンドウを仮想デスクトップ間で移動するためのデフォルトキーは、["W-C-A-Left", "W-C-A-Right"]
-    #   です。この設定は変更しないでください。）
-    fc.window_movement_key_for_desktops = []
-    # fc.window_movement_key_for_desktops += [["W-p", "W-n"]]
-    # fc.window_movement_key_for_desktops += [["W-Up", "W-Down"]]
-
-    # ウィンドウ操作（other_window、restore_window など）の対象としたくないアプリケーションソフトの
-    # “クラス名称”を指定する
+    # ウィンドウ操作（other_window など）の対象としたくないアプリケーションソフトの“クラス名称”を指定する
     # （re.match 関数（先頭からのマッチ）の正規表現に「|」を使って繋げて指定してください。
     #   完全マッチとするためには $ の指定が必要です。）
     fc.window_operation_exclusion_class = r"Progman$"
 
-    # ウィンドウ操作（other_window、restore_window など）の対象としたくないアプリケーションソフトの
-    # “プロセス名称”を指定する
+    # ウィンドウ操作（other_window など）の対象としたくないアプリケーションソフトの“プロセス名称”を指定する
     # （re.match 関数（先頭からのマッチ）の正規表現に「|」を使って繋げて指定してください。
     #   完全マッチとするためには $ の指定が必要です。）
     fc.window_operation_exclusion_process = r"RocketDock\.exe$"  # サンプルとして RocketDock.exe を登録
@@ -570,15 +518,17 @@ def configure(keymap):
                                ["POWERPNT.EXE", "mdiClass"],
                                ]
 
-    # ゲームなど、キーバインドの設定を極力行いたくないアプリケーションソフト（プロセス名称と
-    # クラス名称の組み合わせ（ワイルドカード指定可））を指定する
+    # ゲームなど、キーバインドの設定を極力行いたくないアプリケーションソフト（プロセス名称のみ、
+    # もしくは、プロセス名称、クラス名称、ウィンドウタイトルのリスト（ワイルドカード指定可、
+    # リストの後ろの項目から省略可））を指定する
     # （keymap_global 以外のすべてのキーマップをスルーします。ゲームなど、Keyhac によるキー設定と
     #   相性が悪いアプリケーションソフトを指定してください。keymap_base の設定もスルーするため、
     #   英語 -> 日本語キーボード変換の機能が働かなくなることにご留意ください。）
     # （msrdc.exe の行の有効化の必要性については、次のコミットの説明を参照してください。
     #   https://github.com/smzht/fakeymacs/commit/5ceb921bd754ce348f9cd79b6606086916520945）
-    fc.game_app_list        = [["ffxiv_dx11.exe", "*"],            # FINAL FANTASY XIV
-                               # ["msrdc.exe",      "RAIL_WINDOW"],  # WSLg
+    fc.game_app_list        = ["ffxiv_dx11.exe",              # FINAL FANTASY XIV
+                               # ["msrdc.exe", "RAIL_WINDOW"],  # WSLg
+                               # ["chrome.exe", "Chrome_WidgetWin_1", "（ウィンドウタイトル）"],
                                ]
 
     # 個人設定ファイルのセクション [section-base-1] を読み込んで実行する
@@ -591,9 +541,7 @@ def configure(keymap):
 
     # IME の状態をテキスト カーソル インジケーターの色で表現するときに必要となる設定
     # （https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwineventhook）
-    # （https://sites.google.com/site/agkh6mze/howto/winevent）
     # （https://stackoverflow.com/questions/15849564/how-to-use-winapi-setwineventhook-in-python）
-    # （https://github.com/Danesprite/windows-fun/blob/master/window%20change%20listener.py）
     # （https://tutorialmore.com/questions-652366.htm）
     # （https://www.nicovideo.jp/watch/sm20797948）
 
@@ -759,6 +707,7 @@ def configure(keymap):
     fakeymacs.last_keys = [None, None]
     fakeymacs.correct_ime_status = False
     fakeymacs.window_list = []
+    fakeymacs.delayed_command = None
 
     def is_base_target(window):
         if window is not fakeymacs.last_window or fakeymacs.force_update:
@@ -806,6 +755,8 @@ def configure(keymap):
                 fakeymacs.keymap_decided = True
             else:
                 if not fakeymacs.force_update:
+                    if fc.use_ime_status_reset:
+                        setImeStatus(0)
                     showImeStatus(window.getImeStatus(), window=window)
 
                 fakeymacs.is_base_target = True
@@ -813,8 +764,12 @@ def configure(keymap):
 
         return fakeymacs.is_base_target
 
+    fakeymacs.is_emacs_target = False
+
     def is_emacs_target(window):
         if window is not fakeymacs.last_window or fakeymacs.force_update:
+            fakeymacs.is_emacs_target_in_previous_window = fakeymacs.is_emacs_target
+
             process_name = window.getProcessName()
             class_name   = window.getClassName()
 
@@ -946,7 +901,11 @@ def configure(keymap):
         if getImeStatus() != ime_status:
             # IME を切り替える
             # （setImeStatus(ime_status) を使わないのは、キーボードマクロの再生時に影響がでるため）
-            self_insert_command("(25)")()
+            # （RemoteApp を利用する際、IME の切り替えが正常に動作しない場合があるため、その対策を追加）
+            if os_keyboard_type == "JP":
+                self_insert_command("A-(243)")()
+            else:
+                self_insert_command("A-`")()
 
             if fakeymacs.is_playing_kmacro:
                 delay(0.2)
@@ -1264,10 +1223,12 @@ def configure(keymap):
             setClipboardText("")
             self_insert_command("C-c")()
 
-        self_insert_command("Delete")()
+        self_insert_command("Back")() # Delete は誤動作のもととなるので使わない
+
         backward_char()
         yank()
         forward_char()
+        delay() # この delay を入れると、動作が安定する
 
         if fakeymacs.clipboard_hook:
             # クリップボードの監視用のフックを有効にする
@@ -1726,13 +1687,26 @@ def configure(keymap):
 
         def _keyCommand2(key_list):
             _command1 = _keyCommand1(key_list)
+            up_key = key_list[0].startswith("U-")
 
             if callable(_command1):
                 def _command2():
+                    if not up_key:
+                        if fakeymacs.delayed_command:
+                            _command = fakeymacs.delayed_command
+                            fakeymacs.delayed_command = None
+                            _command()
+
                     fakeymacs.update_last_keys = True
                     _command1()
                     if fakeymacs.update_last_keys:
                         fakeymacs.last_keys = [window_keymap, keys]
+
+                    if up_key:
+                        if fakeymacs.delayed_command:
+                            _command = fakeymacs.delayed_command
+                            fakeymacs.delayed_command = None
+                            _command()
 
                 def _command3():
                     if fakeymacs.repeat_counter == 1 or fakeymacs.is_playing_kmacro:
@@ -1823,18 +1797,21 @@ def configure(keymap):
         if usjis_conv:
             key_list = keyInput(key_list)
 
-        func = keymap.InputKeyCommand(*key_list)
         def _func():
             # 「define_key(keymap_base, "W-S-m", self_insert_command("W-S-m"))」のような設定を
             # した場合、 Shift に RShift を使うと正常に動作しない。その対策。
-            if ((keymap.modifier & (keyhac_keymap.MODKEY_WIN_L | keyhac_keymap.MODKEY_WIN_R) or
+            if (keymap.modifier & keyhac_keymap.MODKEY_SHIFT_R and
+                (keymap.modifier & (keyhac_keymap.MODKEY_WIN_L | keyhac_keymap.MODKEY_WIN_R) or
                  keymap.modifier & (keyhac_keymap.MODKEY_ALT_L | keyhac_keymap.MODKEY_ALT_R)) and
-                keymap.modifier & keyhac_keymap.MODKEY_SHIFT_R and
                 "S-" in key_list[-1]):
                 key_list[-1] = re.sub(r"(^|-)(S-)", r"\1R\2", key_list[-1])
-                keymap.InputKeyCommand(*key_list)()
+
+            if fakeymacs.shift_down:
+                key_list2 = ["D-Shift"] + key_list + ["U-Shift"]
             else:
-                func()
+                key_list2 = key_list
+
+            keymap.InputKeyCommand(*key_list2)()
 
             # Microsoft Word 等では画面に Ctrl ボタンが表示され、Ctrl キーの単押しによりサブウインドウが
             # 開く機能がある。その挙動を抑制するための対策。
@@ -1893,17 +1870,14 @@ def configure(keymap):
             digit_argument(number)
         return _func
 
+    fakeymacs.shift_down = False
+
     def mark(func, forward_direction):
-        # M-< や M-> 押下時に D-Shift が解除されないようにする対策
-        func_d_shift = self_insert_command("D-LShift", "D-RShift")
-        func_u_shift = self_insert_command("U-LShift", "U-RShift")
         def _func():
             if fakeymacs.is_marked:
-                func_d_shift()
-                # Windows 11 で遅延が顕著に発生するようになったので一旦コメント化（必要かもしれないが..）
-                # delay()
+                fakeymacs.shift_down = True
                 func()
-                func_u_shift()
+                fakeymacs.shift_down = False
 
                 # fakeymacs.forward_direction が未設定の場合、設定する
                 if fakeymacs.forward_direction is None:
@@ -2129,11 +2103,11 @@ def configure(keymap):
     define_key(keymap_base, "C-(243)", toggle_input_method) # C-<半角／全角> キー
     define_key(keymap_base, "C-(244)", toggle_input_method) # C-<半角／全角> キー
     define_key(keymap_base, "(240)",   toggle_input_method) # CapsLock キー
-    define_key(keymap_base, "S-(240)", toggle_input_method) # S-CapsLock キー
-
+    define_key(keymap_base, "S-(240)", toggle_input_method) # CapsLock キー
+    
     define_key(keymap_emacs, "C-o C-o", enable_input_method)
     define_key(keymap_emacs, "C-o C-i", disable_input_method)
- 
+
 
     ## 「ファイル操作」のキー設定
     define_key(keymap_emacs, "Ctl-x C-f", reset_search(reset_undo(reset_counter(reset_mark(find_file)))))
@@ -2246,6 +2220,7 @@ def configure(keymap):
     define_key(keymap_emacs, "Ctl-x C-c", reset_search(reset_undo(reset_counter(reset_mark(kill_emacs)))))
     define_key(keymap_emacs, "M-!",       reset_search(reset_undo(reset_counter(reset_mark(shell_command)))))
 
+    ## 「タブ」のキー設定
     if fc.use_ctrl_i_as_tab:
         define_key(keymap_emacs, "C-i", reset_undo(reset_counter(reset_mark(repeat(indent_for_tab_command)))))
 
@@ -2503,31 +2478,21 @@ def configure(keymap):
     ## ファンクションキーの設定
     ###########################################################################
 
-    ## Alt+数字キー列の設定
     if fc.use_alt_digit_key_for_f1_to_f12:
-        mkey = "A-"
-        for i in range(10):
-            define_key(keymap_global, mkey + f"{(i + 1) % 10}", self_insert_command(vkToStr(VK_F1 + i)))
+        for mod1, mod2, mod3 in itertools.product(["", "W-"], ["", "C-"], ["", "S-"]):
+            mod = mod1 + mod2 + mod3
 
-        define_key(keymap_global, mkey + "-", self_insert_command(vkToStr(VK_F11)))
+            mkey = "A-" + mod
+            for i in range(10):
+                define_key(keymap_global,
+                           mkey + f"{(i + 1) % 10}", self_insert_command(mod + vkToStr(VK_F1 + i)))
 
-        if is_japanese_keyboard:
-            define_key(keymap_global, mkey + "^", self_insert_command(vkToStr(VK_F12)))
-        else:
-            define_key(keymap_global, mkey + "=", self_insert_command(vkToStr(VK_F12)))
+            define_key(keymap_global, mkey + "-", self_insert_command(mod + vkToStr(VK_F11)))
 
-    ## Alt+Shift+数字キー列の設定
-    if fc.use_alt_shift_digit_key_for_f13_to_f24:
-        mkey = "A-S-"
-        for i in range(10):
-            define_key(keymap_global, mkey + f"{(i + 1) % 10}", self_insert_command(vkToStr(VK_F13 + i)))
-
-        define_key(keymap_global, mkey + "-", self_insert_command(vkToStr(VK_F23)))
-
-        if is_japanese_keyboard:
-            define_key(keymap_global, mkey + "^", self_insert_command(vkToStr(VK_F24)))
-        else:
-            define_key(keymap_global, mkey + "=", self_insert_command(vkToStr(VK_F24)))
+            if is_japanese_keyboard:
+                define_key(keymap_global, mkey + "^", self_insert_command(mod + vkToStr(VK_F12)))
+            else:
+                define_key(keymap_global, mkey + "=", self_insert_command(mod + vkToStr(VK_F12)))
 
 
     ###########################################################################
@@ -2613,207 +2578,12 @@ def configure(keymap):
 
         return window_list2
 
-    window_list = []
-    window_switching_time = 0
-
-    def windowList():
-        nonlocal window_list
-        nonlocal window_switching_time
-
-        if time.time() - window_switching_time > 1.5:
-            window_list = getWindowList(False)
-
-        window_switching_time = time.time()
-        return window_list
-
-    def switchWindows(window_list_func, direction):
-        window_list = window_list_func()
-
-        # ２つのリストに差異があるか？
-        if set(window_list) ^ set(fakeymacs.window_list):
-            fakeymacs.window_list = window_list
-
-        if fakeymacs.window_list:
-            index = {"previous":-1, "next":1}[direction]
-            window_list = fakeymacs.window_list[index:] + fakeymacs.window_list[:index]
-            popWindow(window_list[0])()
-            fakeymacs.window_list = window_list
-
-    def previous_window(window_list_func):
-        def _func():
-            keymap.delayedCall(lambda: switchWindows(window_list_func, "previous"), 0)
-        return _func
-
-    def next_window(window_list_func):
-        def _func():
-            keymap.delayedCall(lambda: switchWindows(window_list_func, "next"), 0)
-        return _func
-
-    def move_window_to_previous_display():
-        self_insert_command("W-S-Left")()
-
-    def move_window_to_next_display():
-        self_insert_command("W-S-Right")()
-
-    display_areas = [monitor[1] for monitor in pyauto.Window.getMonitorInfo()]
-    display_cnt = len(display_areas)
-
-    def transpose_windows():
-        if display_cnt == 2:
-            def _transpose_windows():
-                window_list = getWindowList()
-                if len(window_list) >= 2:
-                    first_window = None
-                    for window in window_list:
-                        window_rect = window.getRect()
-                        for display_area in display_areas:
-                            if (window_rect[0] >= display_area[0] - 16 and
-                                window_rect[1] >= display_area[1] - 16 and
-                                window_rect[2] <= display_area[2] + 16 and
-                                window_rect[3] <= display_area[3] + 16):
-                                if first_window:
-                                    if display_area != first_window:
-                                        popWindow(window)()
-                                        delay()
-                                        move_window_to_previous_display()
-                                        other_window()
-                                        delay()
-                                        move_window_to_next_display()
-                                        return
-                                else:
-                                    popWindow(window)()
-                                    delay()
-                                    first_window = display_area
-                                break
-
-            keymap.delayedCall(_transpose_windows, 0)
-
-    max_rect = [min([left   for left, top, right, bottom in display_areas]) - 8,
-                max([top    for left, top, right, bottom in display_areas]) - 8,
-                max([right  for left, top, right, bottom in display_areas]) + 8,
-                min([bottom for left, top, right, bottom in display_areas]) + 8]
-
-    window_dict = {}
-
-    def resize_window(forward_direction):
-        def _setRect(rect):
-            # setRect 関数を２回繰り返して実行しているのは、DPI スケールが異なるディスプレイがある
-            # 場合、表示されているウィンドウの位置によってウィンドウを表示するスケールが決まるため、
-            # 一回目でウインドウの位置決めをして、二回目で表示スケールを確定させている。
-            window.setRect(rect)
-            window.setRect(rect)
-
-        window = getTopLevelWindow()
-        if window:
-            if display_cnt == 1:
-                if window.isMaximized():
-                    window.restore()
-                else:
-                    window.maximize()
-            else:
-                if window.isMaximized():
-                    if forward_direction:
-                        window.restore()
-                        delay()
-                        if window not in window_dict:
-                            window_dict[window] = list(window.getRect())
-                        _setRect(max_rect)
-                    else:
-                        if window in window_dict:
-                            _setRect(window_dict[window])
-                            del window_dict[window]
-                        else:
-                            window.restore()
-                else:
-                    if window in window_dict:
-                        _setRect(window_dict[window])
-                        del window_dict[window]
-
-                        if not forward_direction:
-                            window.maximize()
-                    else:
-                        if forward_direction:
-                            window.maximize()
-                        else:
-                            window_dict[window] = list(window.getRect())
-                            _setRect(max_rect)
-
-    def maximize_window():
-        resize_window(True)
-
-    def restore_maximized_window():
-        resize_window(False)
-
-    def minimize_window():
-        window = getTopLevelWindow()
-        if window and not window.isMinimized():
-            window.minimize()
-            delay()
-            window_list = getWindowList()
-            if window in window_list:
-                if window is window_list[-1]:
-                    fakeymacs.reverse_window_to_restore = False
-                else:
-                    fakeymacs.reverse_window_to_restore = True
-
-    def restore_minimized_window():
-        window_list = getWindowList(True)
-        if window_list:
-            if not fakeymacs.reverse_window_to_restore:
-                window_list.reverse()
-            window_list[0].restore()
-
-    def previous_desktop():
-        self_insert_command("W-C-Left")()
-
-    def next_desktop():
-        self_insert_command("W-C-Right")()
-
-    def move_window_to_previous_desktop():
-        self_insert_command("LW-LC-LA-Left")()
-
-    def move_window_to_next_desktop():
-        self_insert_command("LW-LC-LA-Right")()
-
     ##################################################
     ## キーバインド（デスクトップ用）
     ##################################################
 
     # 表示しているウィンドウの中で、一番最近までフォーカスがあったウィンドウに移動
     define_key(keymap_global, fc.other_window_key, other_window)
-
-    # アクティブウィンドウの切り替え
-    for previous_key, next_key in fc.window_switching_key:
-        define_key(keymap_global, previous_key, previous_window(windowList))
-        define_key(keymap_global, next_key,     next_window(windowList))
-
-    # アクティブウィンドウのディスプレイ間移動
-    for previous_key, next_key in fc.window_movement_key_for_displays:
-        define_key(keymap_global, previous_key, move_window_to_previous_display)
-        define_key(keymap_global, next_key,     move_window_to_next_display)
-
-    # デュアルディスプレイにそれぞれ表示されているウィンドウの入れ替え
-    define_key(keymap_global, fc.transpose_windows_key, transpose_windows)
-
-    # ウィンドウの最大化、リストア
-    for restore_key, maximize_key in fc.window_maximize_key:
-        define_key(keymap_global, restore_key,  restore_maximized_window)
-        define_key(keymap_global, maximize_key, maximize_window)
-
-    # ウィンドウの最小化、リストア
-    for restore_key, minimize_key in fc.window_minimize_key:
-        define_key(keymap_global, restore_key,  restore_minimized_window)
-        define_key(keymap_global, minimize_key, minimize_window)
-
-    # 仮想デスクトップの切り替え
-    for previous_key, next_key in fc.desktop_switching_key:
-        define_key(keymap_global, previous_key, previous_desktop)
-        define_key(keymap_global, next_key,     next_desktop)
-
-    # アクティブウィンドウ仮想デスクトップの切り替え
-    for previous_key, next_key in fc.window_movement_key_for_desktops:
-        define_key(keymap_global, previous_key, move_window_to_previous_desktop)
-        define_key(keymap_global, next_key,     move_window_to_next_desktop)
 
     # IME の「単語登録」プログラムの起動
     define_key(keymap_global, fc.word_register_key,
@@ -2914,7 +2684,7 @@ def configure(keymap):
     ##################################################
 
     def lw_newline():
-        if fakeymacs.is_emacs_target == True:
+        if fakeymacs.is_emacs_target_in_previous_window:
             self_insert_command("Enter")()
         else:
             self_insert_command("S-Enter")()
@@ -3164,12 +2934,12 @@ def configure(keymap):
     ####################################################################################################
 
     # キーマップの優先順位を調整する
+    keymap.window_keymap_list.remove(keymap_global)
     keymap.window_keymap_list.remove(keymap_tsw)
     keymap.window_keymap_list.remove(keymap_lw)
-    keymap.window_keymap_list.remove(keymap_global)
+    keymap.window_keymap_list.append(keymap_global)
     keymap.window_keymap_list.append(keymap_tsw)
     keymap.window_keymap_list.append(keymap_lw)
-    keymap.window_keymap_list.append(keymap_global)
 
     # 個人設定ファイルのセクション [section-extension-space_fn] を読み込んで実行する
     exec(readConfigPersonal("[section-extension-space_fn]"), dict(globals(), **locals()))

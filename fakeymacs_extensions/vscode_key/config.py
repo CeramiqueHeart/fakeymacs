@@ -91,8 +91,6 @@ def is_vscode_target(window):
     else:
         return False
 
-fakeymacs.is_vscode_target = is_vscode_target
-
 if fc.use_emacs_ime_mode:
     keymap_vscode = keymap.defineWindowKeymap(check_func=lambda wnd: is_vscode_target(wnd) and not is_emacs_ime_mode(wnd))
 else:
@@ -260,7 +258,10 @@ def focus_into_panel():
 
 def close_panel():
     # VSCode Command : View: Close Panel
-    vscodeExecuteCommand("VCPa", esc=True)()
+    # vscodeExecuteCommand("VCPa", esc=True)()
+
+    # VSCode Command : View: Hide Panel
+    vscodeExecuteCommand("VHP", esc=True)()
     # vscodeExecuteCommand("workbench.action.closePanel")()
 
 def toggle_maximized_panel():
