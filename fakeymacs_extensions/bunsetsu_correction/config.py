@@ -1,4 +1,3 @@
-﻿# -*- mode: python; coding: utf-8-with-signature-dos -*-
 
 ####################################################################################################
 ## 旧 Microsoft IME を使って文節長を変更した際、文節の表示が正しく行われないアプリの対策を行う
@@ -10,7 +9,10 @@ try:
 except:
     # 本機能を適用するアプリを指定する
     fc.bunsetsu_correction_app_list = ["chrome.exe",
-                                       "msedge.exe"]
+                                       "msedge.exe",
+                                       ]
+
+# --------------------------------------------------------------------------------------------------
 
 if fc.use_emacs_ime_mode:
     if fc.ime == "old_Microsoft_IME":

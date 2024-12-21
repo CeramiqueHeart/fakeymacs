@@ -11,7 +11,8 @@ except:
     # 本機能を適用するブラウザのプログラム名称を指定する
     fc.browser_list= ["chrome.exe",
                       "msedge.exe",
-                      "firefox.exe"]
+                      "firefox.exe",
+                      ]
 
 try:
     # 設定されているか？
@@ -26,7 +27,7 @@ try:
     fc.browser_key1
 except:
     # ブラウザをポップアップし、アドレスバーに移動するキーを指定する（IME は OFF）
-    fc.browser_key1 = "C-A-l"
+    fc.browser_key1 = "C-A-i" # C-A-l は VSCode Extension で利用しているため使わない
 
 try:
     # 設定されているか？
@@ -41,6 +42,8 @@ try:
 except:
     # ブラウザをポップアップし、新しいウィンドウを開くキーを指定する（IME は OFF）
     fc.browser_key3 = "C-A-o" # C-A-n は VSCode Extension で利用しているため使わない
+
+# --------------------------------------------------------------------------------------------------
 
 # ブラウザをポップアップしてから指定したキーを実行する
 def browser_popup(key, ime_status, browser_list=fc.browser_list):

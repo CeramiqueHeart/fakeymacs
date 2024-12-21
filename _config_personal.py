@@ -52,22 +52,32 @@ fc.ime_off_cursor_color = 0x0000FF # 赤
 ####################################################################################################
 # [section-base-1] ---------------------------------------------------------------------------------
 
-# すべてのキーマップを透過（スルー）するアプリケーションソフトを指定する（全ての設定に優先する）
+# すべてのキーマップを透過するアプリケーションソフトのプロセス名称（ワイルドカード指定可）を指定する
+# （全ての設定に優先します）
 # （keymap_base、keymap_global を含むすべてのキーマップをスルーします）
 fc.transparent_target       += []
 
-# すべてのキーマップを透過（スルー）するウィンドウのクラスネームを指定する（全ての設定に優先する）
+# すべてのキーマップを透過するウィンドウのクラス名称（ワイルドカード指定可）を指定する
+# （全ての設定に優先します）
 # （keymap_base、keymap_global を含むすべてのキーマップをスルーします）
 fc.transparent_target_class += []
 
-# Emacs のキーバインドにするウィンドウのクラスネームを指定する（fc.not_emacs_target の設定より優先する）
+# Emacs のキーバインドにするウィンドウのクラス名称（ワイルドカード指定可）を指定する
+# （fc.not_emacs_target の設定より優先します）
 fc.emacs_target_class  += []
 
 # Emacs のキーバインドに“したくない”アプリケーションソフトを指定する
-# （Keyhac のメニューから「内部ログ」を ON にすると processname や classname を確認することができます）
+# （アプリケーションソフトは、プロセス名称のみ（ワイルドカード指定可）、もしくは、プロセス名称、
+#   クラス名称、ウィンドウタイトルのリスト（ワイルドカード指定可、リストの後ろの項目から省略可）
+#   を指定してください）
+# （Keyhac のメニューから「内部ログ」を ON にすると、processname や classname を確認することが
+#   できます）
 fc.not_emacs_target    += []
 
 # IME の切り替え“のみをしたい”アプリケーションソフトを指定する
+# （アプリケーションソフトは、プロセス名称のみ（ワイルドカード指定可）、もしくは、プロセス名称、
+#   クラス名称、ウィンドウタイトルのリスト（ワイルドカード指定可、リストの後ろの項目から省略可）
+#   を指定してください）
 # （指定できるアプリケーションソフトは、not_emacs_target で（除外）指定したものからのみとなります）
 fc.ime_target          += []
 
@@ -77,7 +87,7 @@ fc.ime_target          += []
 #   利用することができます。ワイルドカード文字をエスケープしたい場合は、[] で括ってください。）
 # （ここで指定したキーに新たに別のキー設定をしたいときには、「-2」が付くセクション内で define_key2
 #   関数を利用して定義してください）
-fc.skip_settings_key    = {"keymap_base"      : ["*W-g", "A-Tab"], # ベース Keymap
+fc.skip_settings_key    = {"keymap_base"      : ["W-g", "A-Tab"], # ベース Keymap
                            "keymap_global"    : [], # グローバル Keymap
                            "keymap_emacs"     : [], # Emacs キーバインド対象アプリ用 Keymap
                            "keymap_vscode"    : [], # Emacs キーバインド VSCode 拡張用 Keymap
@@ -208,9 +218,10 @@ fc.clipboardList_key = "A-y"
 # ランチャーリストを起動するキーを指定する
 fc.lancherList_key = "A-l"
 
-# ゲームなど、キーバインドの設定を極力行いたくないアプリケーションソフト（プロセス名称のみ、
-# もしくは、プロセス名称、クラス名称、ウィンドウタイトルのリスト（ワイルドカード指定可、
-# リストの後ろの項目から省略可））を指定する
+# ゲームなど、キーバインドの設定を極力行いたくないアプリケーションソフトを指定する
+# （アプリケーションソフトは、プロセス名称のみ（ワイルドカード指定可）、もしくは、プロセス名称、
+#   クラス名称、ウィンドウタイトルのリスト（ワイルドカード指定可、リストの後ろの項目から省略可）
+#   を指定してください）
 # （keymap_global 以外のすべてのキーマップをスルーします。ゲームなど、Keyhac によるキー設定と
 #   相性が悪いアプリケーションソフトを指定してください。keymap_base の設定もスルーするため、
 #   英語 -> 日本語キーボード変換の機能が働かなくなることにご留意ください。）
@@ -218,7 +229,6 @@ fc.lancherList_key = "A-l"
 #   https://github.com/smzht/fakeymacs/commit/5ceb921bd754ce348f9cd79b6606086916520945）
 fc.game_app_list        = ["ffxiv_dx11.exe",              # FINAL FANTASY XIV
                            # ["msrdc.exe", "RAIL_WINDOW"],  # WSLg
-                           # ["chrome.exe", "Chrome_WidgetWin_1", "（ウィンドウタイトル）"],
                            ]
 
 # [section-base-2] ---------------------------------------------------------------------------------
@@ -342,7 +352,8 @@ if 0:
 # Chrome 系ブラウザで Ctl-x C-b を入力した際、Chrome の拡張機能 QuicKey を起動する
 if 0:
     fc.chrome_list= ["msedge.exe",
-                     "chrome.exe"]
+                     "chrome.exe",
+                     ]
     fc.quickey_shortcut_key = "A-q"
     exec(readConfigExtension(r"chrome_quickey\config.py"), dict(globals(), **locals()))
 
@@ -352,7 +363,8 @@ if 0:
 if 0:
     fc.browser_list= ["chrome.exe",
                       "msedge.exe",
-                      "firefox.exe"]
+                      "firefox.exe",
+                      ]
     exec(readConfigExtension(r"browser_key\config.py"), dict(globals(), **locals()))
 
 # --------------------------------------------------------------------------------------------------
@@ -383,30 +395,16 @@ if 0:
 
 # VSCode 用のキーの設定を行う
 if 0:
-    fc.vscode_target  = ["Code.exe"]
-#    fc.vscode_target += ["chrome.exe",
-#                         "msedge.exe",
-#                         "firefox.exe",
-#                         ]
-
-    # fc.vscode_prefix_key = [["C-;", "C-A-;"]]
+    fc.vscode_prefix_key  = [["C-k", "C-A-k"]]
+    fc.cursor_prefix_key  = [["C-m", "C-A-m"]]
+    fc.vscode_replace_key = []
+    fc.cursor_replace_key = [["C-e", "C-A-e"],
+                             ["C-l", "C-A-l"],
+                             ]
     fc.use_ctrl_atmark_for_mark = False
     fc.use_direct_input_in_vscode_terminal = False
     fc.esc_mode_in_keyboard_quit = 1
-
-    # VSCode Extension 用のキーの設定を行う
-    fc.vscode_dired = False
-    fc.vscode_recenter = False
-    fc.vscode_recenter2 = False
-    fc.vscode_occur = False
-    fc.vscode_quick_select = True
-    fc.vscode_input_sequence = True
-    fc.vscode_insert_numbers = True
-    fc.vscode_keyboard_macro = False
-    fc.vscode_filter_text = False
-
     exec(readConfigExtension(r"vscode_key\config.py"), dict(globals(), **locals()))
-    # vscode_extensions\config.py は、vscode_key\config.py 内部から呼ばれている
 
 # --------------------------------------------------------------------------------------------------
 # ■ IME 関連
@@ -426,6 +424,17 @@ if 0:
 
 # --------------------------------------------------------------------------------------------------
 # ■ Emacs 関連
+# --------------------------------------------------------------------------------------------------
+
+# Emacs をターミナルソフトで動かす場合に event-apply-modifier を使ってキーの置き換えを行う
+if 0:
+    fc.emacs_terminal = ["ubuntu*.exe",
+                         [None, None,  "さくらのクラウドシェル (リモート)"],
+                         ]
+    fc.emacs_replace_key = [["C-;", "C-x @ c ;"],
+                            ]
+    exec(readConfigExtension(r"emacs_terminal\config.py"), dict(globals(), **locals()))
+
 # --------------------------------------------------------------------------------------------------
 
 # Emacs を利用する際のキーバインドの調整を行う
@@ -522,5 +531,11 @@ if 0:
     # fc.space_fn_window_keymap_list += [keymap_ei]
     # fc.space_fn_window_keymap_list += [fakeymacs.keymap_vscode]
     exec(readConfigExtension(r"space_fn\config.py"), dict(globals(), **locals()))
+
+# [section-extension-capslock_key] -----------------------------------------------------------------
+
+# CapsLock キーを Ctrl キーとして使うための設定を行う
+if 0:
+    exec(readConfigExtension(r"capslock_key\config.py"), dict(globals(), **locals()))
 
 # --------------------------------------------------------------------------------------------------

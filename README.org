@@ -41,8 +41,11 @@ manual は次のリンクを参照してください。
 （モードに入ると、▲のマークが表示されます。） Emacs 日本語入力モードになると Emacs キーバインド
 として利用できるキーが限定され、その他のキーは Windows にそのまま渡されるようになるため、
 IME のショートカットキーが利用できるようになります。
-また、このモードでは IME のショートカットを置き換える機能もサポートしており、初期値では
+また、このモードでは IME のショートカットキーを置き換える機能もサポートしており、初期値では
 「ことえり」のキーバインドを利用できるようにしています。
+詳しくは、次のページの「■ 「Emacs 日本語入力モード」のキーバインド」の項を参照してください。
+
+- [[/fakeymacs_manuals/key_bindings.org#-emacs-日本語入力モードのキーバインド]]
 
 ** キーマップのレイヤー構成
 
@@ -52,21 +55,29 @@ IME のショートカットキーが利用できるようになります。
 
 [[/fakeymacs_manuals/keymap_layer/keymap_layer.png]]
 
+※ keymap_remote レイヤーは、capslock_key Extension を有効にしたときに機能するレイヤーです。
+
 ※ keymap_vscode レイヤーは、vscode_key Extension を有効にしたときに機能するレイヤーです。
+
+※ keymap_ei レイヤーは、fc.use_emacs_ime_mode 変数が True の時に機能するレイヤーです。
 
 ** 使い方
 
 *** 1) キーボード配列の調整を行う
 
-A キーの左横が Caps Lock のキーボードを使っている場合は、右 Control キーに置き換える
+A キーの左横が CapsLock のキーボードを使っている場合は、右 Control キーに置き換える
 ことをお勧めします。
 
-Caps Lock のキーの置き換えは Keyhac ではできませんので、KeySwap や Change Key という
-ツールで対応ください。Caps Lock の変更だけであれば、KeySwap の利用をお勧めします。
+CapsLock のキーの置き換えは Keyhac ではできませんので、KeySwap や Change Key という
+ツールで対応ください。CapsLock の変更だけであれば、KeySwap の利用をお勧めします。
 
 - http://pasokatu.com/8460
 
 変更後、Windows の再ログインを行ってください。
+
+なお、管理権限を持たない PC を利用している場合は、Fakeymacs の機能で CapsLock キーを
+Control キーとして利用することができます。詳しくは、以降にある「CapsLock キーを
+ Ctrl キーとして使う機能について」の項を参照してください。
 
 *** 2) IMEを切り替えるショートカットキーを無効化する
 
@@ -149,7 +160,7 @@ _config_personal.py ファイルを config_personal.pyという名称に変更�
 | fc.game_app_list           | ゲームなど、キーバインドの設定を極力行いたくないアプリケーションソフトを指定する |
 |----------------------------+----------------------------------------------------------------------------------|
 
-※ 1) で Caps Lock に右 Control キーを割り当てた場合には、fc.side_of_ctrl_key を "R" に
+※ 1) で CapsLock に右 Control キーを割り当てた場合には、fc.side_of_ctrl_key 変数を "R" に
 変更する必要があります。この場合、左 Control キーは従来どおり Windows ショートカット用
 のキーとして利用できます。
 
@@ -168,7 +179,7 @@ config_personal.py には、Fakeymacs の拡張機能を有効化／無効化す
 （拡張機能を有効化する場合には、if 0: を if 1: にしてください。
 また、必要であれば、コンフィグレーションパラメータの設定も行ってください。）
 
-- https://github.com/smzht/fakeymacs/blob/master/fakeymacs_manuals/extensions.org
+- [[/fakeymacs_manuals/extensions.org]]
 
 VSCode を利用する場合には、次の vscode_key Extension 用のコンフィグレーションパラメータの設定は
 確認してください。
@@ -197,7 +208,7 @@ fc.use_usjis_keyboard_conversion 変数を True に設定してください。
 英語配列では使わないキーを英語キーボードのキー配置にあるキーに再割当てすることで、
 日本語キーボードを英語キーボードのキー配置により近い形で利用することが可能となります。
 
-- https://github.com/smzht/fakeymacs/tree/master/fakeymacs_extensions/change_keyboard2
+- [[/fakeymacs_extensions/change_keyboard2]]
 
 *** 10) テキスト カーソル インジケーターの設定を行う（オプション）
 
@@ -274,6 +285,17 @@ Ctrl+Space（set-mark-command）を入力する際に Space が Fn キーとし�
 Fakeymacs 独自の方法で解決しています。
 Emacs のキーバインドとも十分に共存が可能なものとなっていますので、一度お試しいただければと思います。
 
+** CapsLock キーを Ctrl キーとして使う機能について
+
+管理権限を持たない PC を利用している場合でレジストリによるキーの置き換えができない場合のために、
+CapsLock キーを Ctrl キーとして使うための機能を提供しています。
+
+|----------------+-----------------------------------------------------|
+| Extension name | Description                                         |
+|----------------+-----------------------------------------------------|
+| [[/fakeymacs_extensions/capslock_key][capslock_key]]   | CapsLock キーを Ctrl キーとして使うための設定を行う |
+|----------------+-----------------------------------------------------|
+
 ** HHKB Studio のキーマップ設定例について
 
 HHKB Studio で Fakeymacs を使う際の、キーマップの設定例について紹介します。
@@ -284,6 +306,19 @@ HHKB Studio は Fakeymacs と相性の良いキーボードなので、キーボ
 いただければと思います。
 
 ** 留意事項
+
+● Mouse without Borders というアプリを利用している場合、Ctrl+Shift+S というショートカットキーが
+設定されています。このショートカットキーは、一般的な Windows アプリの「名前を付けて保存」機能の
+ショートカットキーを上書きしてしまいます。Mouse without Borders アプリを利用している場合は、
+アプリ側でこのショートカットキーを変更するか、無効にするなどの対策をお願いします。
+
+- https://www.sriproot.net/blog/ctrl-shift-s-saveas-922
+
+また、現在このアプリは PowerToys というアプリの「境界線のないマウス」という機能に統合されている
+ようです。こちらの機能ではショートカットキーの見直しがされていますので、PowerToys への切り替えも
+ご検討ください。
+
+- https://learn.microsoft.com/ja-jp/windows/powertoys/mouse-without-borders
 
 ● Microsoft Excel や Word などの Office系アプリを使ってコピー＆ペーストをした際、「Ctrl」と表示
 される「貼り付けオプション」ボタンが表示される場合があります。
@@ -309,8 +344,8 @@ OFF にしてから割当をしないと正常に動作しませんでした。�
 ● Windows 11 にしたら、Keyhac のコンソールに「Time stamp inversion happened.」と表示される頻度が
 高くなりました。これは、レジストリ HKEY_CURRENT_USER\Control Panel\Desktop\LowLevelHooksTimeout を
 DWORD 形式で作成し、そこに ms の値（10進数で 3000 などの数値）を設定して再起動することで、
-ある程度の回避ができるようです。ただし、この設定により生ずる影響は分かっていませんので、試す場合は
-各自の責任でお願いします。
+ある程度の回避ができるようです。また、この設定は、文字が二重に出力される場合にも効果があるようです。
+ただし、この設定により生ずる影響は分かっていませんので、試す場合は各自の責任でお願いします。
 
 - https://apollo440.hatenablog.com/entries/2010/12/21
 - https://nazochu.blogspot.com/2011/08/windows7.html

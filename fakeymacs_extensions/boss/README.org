@@ -1,6 +1,5 @@
-#+STARTUP: showall indent
 
-* Fakeymacs extension
+* Fakeymacs extension - boss -
 
 ** ■ Boss だ！
 

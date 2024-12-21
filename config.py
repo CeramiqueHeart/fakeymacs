@@ -6,10 +6,10 @@
 ##  Windows の操作を Emacs のキーバインドで行うための設定（Keyhac版）
 #########################################################################
 
-fakeymacs_version = "20240621_01"
+fakeymacs_version = "20241216_01"
 
 import time
-import os.path
+import os
 import re
 import fnmatch
 import copy
@@ -170,15 +170,18 @@ def configure(keymap):
     ## カスタマイズパラメータの設定
     ###########################################################################
 
-    # すべてのキーマップを透過（スルー）するアプリケーションソフトを指定する（全ての設定に優先する）
+    # すべてのキーマップを透過するアプリケーションソフトのプロセス名称（ワイルドカード指定可）を指定する
+    # （全ての設定に優先します）
     # （keymap_base、keymap_global を含むすべてのキーマップをスルーします）
     fc.transparent_target       = []
 
-    # すべてのキーマップを透過（スルー）するウィンドウのクラスネームを指定する（全ての設定に優先する）
+    # すべてのキーマップを透過するウィンドウのクラス名称（ワイルドカード指定可）を指定する
+    # （全ての設定に優先します）
     # （keymap_base、keymap_global を含むすべてのキーマップをスルーします）
     fc.transparent_target_class = ["IHWindowClass"]      # Remote Desktop
 
-    # Emacs のキーバインドにするウィンドウのクラスネームを指定する（fc.not_emacs_target の設定より優先する）
+    # Emacs のキーバインドにするウィンドウのクラス名称（ワイルドカード指定可）を指定する
+    # （fc.not_emacs_target の設定より優先します）
     fc.emacs_target_class   = ["Edit",                   # テキスト入力フィールドなどが該当
                                "Button",                 # ボタン
                                "ComboBox",               # コンボボックス
@@ -186,41 +189,30 @@ def configure(keymap):
                                ]
 
     # Emacs のキーバインドに“したくない”アプリケーションソフトを指定する
-    # （Keyhac のメニューから「内部ログ」を ON にすると processname や classname を確認することができます）
+    # （アプリケーションソフトは、プロセス名称のみ（ワイルドカード指定可）、もしくは、プロセス名称、
+    #   クラス名称、ウィンドウタイトルのリスト（ワイルドカード指定可、リストの後ろの項目から省略可）
+    #   を指定してください）
+    # （Keyhac のメニューから「内部ログ」を ON にすると、processname や classname を確認することが
+    #   できます）
     fc.not_emacs_target     = ["wsl.exe",                # WSL
                                "bash.exe",               # WSL
-                               "ubuntu.exe",             # WSL
-                               "ubuntu1604.exe",         # WSL
-                               "ubuntu1804.exe",         # WSL
-                               "ubuntu2004.exe",         # WSL
-                               "ubuntu2204.exe",         # WSL
-                               "ubuntu2404.exe",         # WSL
+                               "ubuntu*.exe",            # WSL
                                "debian.exe",             # WSL
                                "kali.exe",               # WSL
-                               "SLES-12.exe",            # WSL
-                               "openSUSE-42.exe",        # WSL
-                               "openSUSE-Leap-15-1.exe", # WSL
+                               "SLES-*.exe",             # WSL
+                               "openSUSE-*.exe",         # WSL
                                "WindowsTerminal.exe",    # Windows Terminal
                                "mintty.exe",             # mintty
                                "Cmder.exe",              # Cmder
-                               "ConEmu.exe",             # ConEmu
-                               "ConEmu64.exe",           # ConEmu
-                               "emacs.exe",              # Emacs
-                               "emacs-X11.exe",          # Emacs
-                               "emacs-w32.exe",          # Emacs
+                               "ConEmu*.exe",            # ConEmu
+                               "emacs*.exe",             # Emacs
                                "gvim.exe",               # GVim
                                "xyzzy.exe",              # xyzzy
                                "msrdc.exe",              # WSLg
-                               "XWin.exe",               # Cygwin/X
-                               "XWin_MobaX.exe",         # MobaXterm/X
-                               "XWin_MobaX_1.16.3.exe",  # MobaXterm/X
-                               "XWin_MobaX_1.20.4.exe",  # MobaXterm/X
-                               "XWin_Cygwin_1.14.5.exe", # MobaXterm/X
-                               "XWin_Cygwin_1.16.3.exe", # MobaXterm/X
+                               "XWin*.exe",              # XWin
                                "Xming.exe",              # Xming
                                "vcxsrv.exe",             # VcXsrv
-                               "GWSL_vcxsrv.exe",        # GWSL
-                               "GWSL_vcxsrv_lowdpi.exe", # GWSL
+                               "GWSL_vcxsrv*.exe",       # GWSL
                                "X410.exe",               # X410
                                "Xpra-Launcher.exe",      # Xpra
                                "putty.exe",              # PuTTY
@@ -231,32 +223,32 @@ def configure(keymap):
                                "vncviewer64.exe",        # UltraVNC
                                "Poderosa.exe",           # Poderosa
                                "RLogin.exe",             # RLogin
-                              ]
+                               "vncviewer*.exe",         # UltraVNC
+                               [None, None, "さくらのクラウドシェル (リモート)"],
+                               ]
 
     # IME の切り替え“のみをしたい”アプリケーションソフトを指定する
+    # （アプリケーションソフトは、プロセス名称のみ（ワイルドカード指定可）、もしくは、プロセス名称、
+    #   クラス名称、ウィンドウタイトルのリスト（ワイルドカード指定可、リストの後ろの項目から省略可）
+    #   を指定してください）
     # （指定できるアプリケーションソフトは、not_emacs_target で（除外）指定したものからのみとなります）
     fc.ime_target           = ["wsl.exe",                # WSL
                                "bash.exe",               # WSL
-                               "ubuntu.exe",             # WSL
-                               "ubuntu1604.exe",         # WSL
-                               "ubuntu1804.exe",         # WSL
-                               "ubuntu2004.exe",         # WSL
-                               "ubuntu2204.exe",         # WSL
+                               "ubuntu*.exe",            # WSL
                                "debian.exe",             # WSL
                                "kali.exe",               # WSL
-                               "SLES-12.exe",            # WSL
-                               "openSUSE-42.exe",        # WSL
-                               "openSUSE-Leap-15-1.exe", # WSL
+                               "SLES-*.exe",             # WSL
+                               "openSUSE-*.exe",         # WSL
                                "WindowsTerminal.exe",    # Windows Terminal
                                "mintty.exe",             # mintty
                                "Cmder.exe",              # Cmder
-                               "ConEmu.exe",             # ConEmu
-                               "ConEmu64.exe",           # ConEmu
+                               "ConEmu*.exe",            # ConEmu
                                "gvim.exe",               # GVim
                                "xyzzy.exe",              # xyzzy
                                "putty.exe",              # PuTTY
                                "ttermpro.exe",           # TeraTerm
                                "MobaXterm.exe",          # MobaXterm
+                               [None, None, "さくらのクラウドシェル (リモート)"],
                                ]
 
     # キーマップ毎にキー設定をスキップするキーを指定する
@@ -264,7 +256,7 @@ def configure(keymap):
     #   のような指定の他に、"M-f" や "Ctl-x d" などの指定も可能です。"M-g*" のようにワイルドカードも
     #   利用することができます。ワイルドカード文字をエスケープしたい場合は、[] で括ってください。）
     # （ここで指定したキーに新たに別のキー設定をしたいときには、define_key2 関数を利用してください）
-    fc.skip_settings_key    = {"keymap_base"      : ["*W-g", "A-Tab"], # ベース Keymap
+    fc.skip_settings_key    = {"keymap_base"      : ["W-g", "A-Tab"], # ベース Keymap
                                "keymap_global"    : [], # グローバル Keymap
                                "keymap_emacs"     : [], # Emacs キーバインド対象アプリ用 Keymap
                                "keymap_ime"       : [], # IME 切り替え専用アプリ用 Keymap
@@ -283,11 +275,11 @@ def configure(keymap):
                                "Code.exe"         : ["C-S-b", "C-S-f", "C-S-p", "C-S-n", "C-S-a", "C-S-e"],
                                }
 
-    # clipboard 監視の対象外とするアプリケーションソフトを指定する
+    # clipboard 監視の対象外とするアプリケーションソフトのプロセス名称（ワイルドカード指定可）を指定する
     fc.not_clipboard_target = []
     fc.not_clipboard_target += ["EXCEL.EXE"] # Microsoft Excel
 
-    # clipboard 監視の対象外とするウィンドウのクラスネームを指定する（ワイルドカードの指定可）
+    # clipboard 監視の対象外とするウィンドウのクラス名称（ワイルドカード指定可）を指定する
     fc.not_clipboard_target_class = []
     fc.not_clipboard_target_class += ["HwndWrapper*"] # WPF アプリ
 
@@ -458,9 +450,9 @@ def configure(keymap):
     #---------------------------------------------------------------------------------------------------
 
     # Emacs キーバインドを切り替えるキーを指定する
-    # （Emacs キーバインドを利用するアプリケーションでかつフォーカスが当たっているアプリケーションソフト
-    #   に対して切り替えが機能します。また、Emacs キーバインドを OFF にしても、IME の切り替えは ime_target
-    #   に登録したアプリケーションソフトと同様に機能するようにしています。）
+    # （Emacs キーバインドを利用するアプリケーションソフトでかつフォーカスが当たっているソフトに対して
+    #   切り替えが機能します。また、Emacs キーバインドを OFF にしても、IME の切り替えは ime_target に
+    #   登録したアプリケーションソフトと同様に機能するようにしています。）
     # （fc.emacs_target_class 変数に指定したクラスに該当するアプリケーションソフト（Windows10版 Notepad など）
     #   は、Emacs キーバインドを切り替えの対象となりません（常に Emacs キーバインドとなります）。）
     fc.toggle_emacs_keybind_key = "C-S-Space"
@@ -481,15 +473,13 @@ def configure(keymap):
     # 表示しているウィンドウの中で、一番最近までフォーカスがあったウィンドウに移動するキーを指定する
     fc.other_window_key = "A-o"
 
-    # ウィンドウ操作（other_window など）の対象としたくないアプリケーションソフトの“クラス名称”を指定する
-    # （re.match 関数（先頭からのマッチ）の正規表現に「|」を使って繋げて指定してください。
-    #   完全マッチとするためには $ の指定が必要です。）
-    fc.window_operation_exclusion_class = r"Progman$"
+    # ウィンドウ操作（other_window など）の対象としたくないアプリケーションソフトのクラス名称を指定する
+    # （正規表現で指定してください（複数指定する場合は「|」で連結してください））
+    fc.window_operation_exclusion_class = r"Progman"
 
-    # ウィンドウ操作（other_window など）の対象としたくないアプリケーションソフトの“プロセス名称”を指定する
-    # （re.match 関数（先頭からのマッチ）の正規表現に「|」を使って繋げて指定してください。
-    #   完全マッチとするためには $ の指定が必要です。）
-    fc.window_operation_exclusion_process = r"RocketDock\.exe$"  # サンプルとして RocketDock.exe を登録
+    # ウィンドウ操作（other_window など）の対象としたくないアプリケーションソフトのプロセス名称を指定する
+    # （正規表現で指定してください（複数指定する場合は「|」で連結してください））
+    fc.window_operation_exclusion_process = r"RocketDock\.exe"  # サンプルとして RocketDock.exe を登録
 
     # クリップボードリストを起動するキーを指定する
     fc.clipboardList_key = "A-y"
@@ -502,7 +492,8 @@ def configure(keymap):
     fc.command_name = r"cmd.exe"
 
     # コマンドのリピート回数の最大値を指定する
-    fc.repeat_max = 1024
+    # （数値を大きくしていくと「Time stamp inversion happened.」が発生するので注意してください）
+    fc.repeat_max = 128
 
     # Microsoft Excel のセル内で改行を選択可能かを指定する（True: 選択可、False: 選択不可）
     # （kill_line 関数の挙動を変えるための変数です。Microsoft Excel 2019 以降では True にして
@@ -518,9 +509,10 @@ def configure(keymap):
                                ["POWERPNT.EXE", "mdiClass"],
                                ]
 
-    # ゲームなど、キーバインドの設定を極力行いたくないアプリケーションソフト（プロセス名称のみ、
-    # もしくは、プロセス名称、クラス名称、ウィンドウタイトルのリスト（ワイルドカード指定可、
-    # リストの後ろの項目から省略可））を指定する
+    # ゲームなど、キーバインドの設定を極力行いたくないアプリケーションソフトを指定する
+    # （アプリケーションソフトは、プロセス名称のみ（ワイルドカード指定可）、もしくは、プロセス名称、
+    #   クラス名称、ウィンドウタイトルのリスト（ワイルドカード指定可、リストの後ろの項目から省略可）
+    #   を指定してください）
     # （keymap_global 以外のすべてのキーマップをスルーします。ゲームなど、Keyhac によるキー設定と
     #   相性が悪いアプリケーションソフトを指定してください。keymap_base の設定もスルーするため、
     #   英語 -> 日本語キーボード変換の機能が働かなくなることにご留意ください。）
@@ -528,7 +520,6 @@ def configure(keymap):
     #   https://github.com/smzht/fakeymacs/commit/5ceb921bd754ce348f9cd79b6606086916520945）
     fc.game_app_list        = ["ffxiv_dx11.exe",              # FINAL FANTASY XIV
                                # ["msrdc.exe", "RAIL_WINDOW"],  # WSLg
-                               # ["chrome.exe", "Chrome_WidgetWin_1", "（ウィンドウタイトル）"],
                                ]
 
     # 個人設定ファイルのセクション [section-base-1] を読み込んで実行する
@@ -708,14 +699,51 @@ def configure(keymap):
     fakeymacs.correct_ime_status = False
     fakeymacs.window_list = []
     fakeymacs.delayed_command = None
+    fakeymacs.shift_down = False
+    fakeymacs.shift_down2 = False
+
+    regex = "|".join([fnmatch.translate(p) for p in fc.transparent_target])
+    if regex == "": regex = "$." # 絶対にマッチしない正規表現
+    transparent_target = re.compile(regex)
+
+    regex = "|".join([fnmatch.translate(c) for c in fc.transparent_target_class])
+    if regex == "": regex = "$." # 絶対にマッチしない正規表現
+    transparent_target_class = re.compile(regex)
+
+    regex = "|".join([fnmatch.translate(p) for p in fc.not_clipboard_target])
+    if regex == "": regex = "$." # 絶対にマッチしない正規表現
+    not_clipboard_target = re.compile(regex)
+
+    regex = "|".join([fnmatch.translate(c) for c in fc.not_clipboard_target_class])
+    if regex == "": regex = "$." # 絶対にマッチしない正規表現
+    not_clipboard_target_class = re.compile(regex)
+
+    regex = "|".join([fnmatch.translate(c) for c in fc.emacs_target_class])
+    if regex == "": regex = "$." # 絶対にマッチしない正規表現
+    emacs_target_class = re.compile(regex)
+
+    regex = "|".join([fnmatch.translate(app) for app in fc.not_emacs_target if type(app) is str])
+    if regex == "": regex = "$." # 絶対にマッチしない正規表現
+    not_emacs_target1 = re.compile(regex)
+    not_emacs_target2 = [app for app in fc.not_emacs_target if type(app) is list]
+
+    regex = "|".join([fnmatch.translate(app) for app in fc.ime_target if type(app) is str])
+    if regex == "": regex = "$." # 絶対にマッチしない正規表現
+    ime_target1 = re.compile(regex)
+    ime_target2 = [app for app in fc.ime_target if type(app) is list]
+
+    regex = "|".join([fnmatch.translate(app) for app in fc.game_app_list if type(app) is str])
+    if regex == "": regex = "$." # 絶対にマッチしない正規表現
+    game_app_list1 = re.compile(regex)
+    game_app_list2 = [app for app in fc.game_app_list if type(app) is list]
 
     def is_base_target(window):
         if window is not fakeymacs.last_window or fakeymacs.force_update:
             process_name = window.getProcessName()
             class_name   = window.getClassName()
 
-            if (process_name in fc.not_clipboard_target or
-                any(checkWindow(None, c, window=window) for c in fc.not_clipboard_target_class)):
+            if (not_clipboard_target.match(window.getProcessName()) or
+                not_clipboard_target_class.match(window.getClassName())):
                 # クリップボードの監視用のフックを無効にする
                 keymap.clipboard_history.enableHook(False)
                 fakeymacs.clipboard_hook = False
@@ -747,10 +775,10 @@ def configure(keymap):
                 fakeymacs.is_base_target = True
                 fakeymacs.keymap_decided = True
 
-            elif (process_name in fc.transparent_target or
-                  class_name in fc.transparent_target_class or
-                  any(checkWindow(*app, window=window) if type(app) is list else
-                      checkWindow(app, window=window) for app in fc.game_app_list)):
+            elif (transparent_target.match(window.getProcessName()) or
+                  transparent_target_class.match(window.getClassName()) or
+                  game_app_list1.match(window.getProcessName()) or
+                  any(checkWindow(*app, window=window) for app in game_app_list2)):
                 fakeymacs.is_base_target = False
                 fakeymacs.keymap_decided = True
             else:
@@ -774,20 +802,21 @@ def configure(keymap):
             class_name   = window.getClassName()
 
             if (fakeymacs.keymap_decided == True or
-                (class_name not in fc.emacs_target_class and
+                (not emacs_target_class.match(window.getClassName()) and
                  (process_name in fakeymacs.not_emacs_keybind or
-                  process_name in fc.not_emacs_target))):
+                  not_emacs_target1.match(window.getProcessName()) or
+                  any(checkWindow(*app, window=window) for app in not_emacs_target2)))):
                 fakeymacs.is_emacs_target = False
             else:
                 reset_undo(reset_counter(reset_mark(lambda: None)))()
                 fakeymacs.ime_cancel = False
 
                 if process_name in fc.emacs_exclusion_key:
-                    fakeymacs.emacs_exclution_key = [
+                    fakeymacs.emacs_exclusion_key = [
                         keyStrNormalization(addSideOfModifierKey(specialCharToKeyStr(key)))
                         for key in fc.emacs_exclusion_key[process_name]]
                 else:
-                    fakeymacs.emacs_exclution_key = []
+                    fakeymacs.emacs_exclusion_key = []
 
                 fakeymacs.is_emacs_target = True
                 fakeymacs.keymap_decided = True
@@ -802,7 +831,8 @@ def configure(keymap):
 
             if (fakeymacs.keymap_decided == False and
                 (process_name in fakeymacs.not_emacs_keybind or
-                 process_name in fc.ime_target)):
+                 ime_target1.match(window.getProcessName()) or
+                 any(checkWindow(*app, window=window) for app in ime_target2))):
                 fakeymacs.is_ime_target = True
             else:
                 fakeymacs.is_ime_target = False
@@ -824,8 +854,8 @@ def configure(keymap):
     # リージョンを拡張する際に、順方向に拡張すると True、逆方向に拡張すると False になる
     fakeymacs.forward_direction = None
 
-    # 検索が開始されると True になる
-    fakeymacs.is_searching = False
+    # 検索画面が表示されるとされると False になり、検索が開始されると True になる
+    fakeymacs.is_searching = None
 
     # キーボードマクロの play 中 は True になる
     fakeymacs.is_playing_kmacro = False
@@ -871,8 +901,9 @@ def configure(keymap):
         class_name   = keymap.getWindow().getClassName()
         process_name = keymap.getWindow().getProcessName()
 
-        if (class_name not in fc.emacs_target_class and
-            process_name not in fc.not_emacs_target):
+        if (not emacs_target_class.match(class_name) and
+            not (not_emacs_target1.match(process_name) or
+                 any(checkWindow(*app) for app in not_emacs_target2))):
             if process_name in fakeymacs.not_emacs_keybind:
                 fakeymacs.not_emacs_keybind.remove(process_name)
                 keymap.popBalloon("keybind", "[Enable Emacs keybind]", 1000)
@@ -947,10 +978,10 @@ def configure(keymap):
     def popImeBalloon(ime_status, force=False, window=None):
         if not fakeymacs.is_playing_kmacro:
             if force or fc.use_ime_status_balloon:
-                # LINE アプリなど、Qt5152QWindowIcon にマッチするクラスをもつアプリは入力文字に
+                # LINE アプリなど、Qt*QWindowIcon にマッチするクラスをもつアプリは入力文字に
                 # バルーンヘルプが被るので、バルーンヘルプの表示対象から外す
                 # （ただし、force が True の場合は除く）
-                if force or not checkWindow(None, "Qt5152QWindowIcon", window=window):
+                if force or not checkWindow(class_name="Qt*QWindowIcon", window=window):
                     if ime_status:
                         message = fc.ime_status_balloon_message[1]
                     else:
@@ -989,12 +1020,7 @@ def configure(keymap):
         self_insert_command("C-s")()
 
     def write_file():
-        # https://www.sriproot.net/blog/ctrl-shift-s-saveas-922
-        # self_insert_command("C-S-s")()
-
-        self_insert_command("A-f")()
-        delay()
-        self_insert_command("a")()
+        self_insert_command("C-S-s")()
 
     def dired():
         keymap.ShellExecuteCommand(None, r"explorer.exe", "", "")()
@@ -1043,6 +1069,9 @@ def configure(keymap):
         if (checkWindow("sakura.exe", "EditorClient") or # Sakura Editor
             checkWindow("sakura.exe", "SakuraView*")):   # Sakura Editor
             self_insert_command3("C-j")()
+
+        elif checkWindow("TeXworks.exe", "Qt661QWindowIcon"): # TeXworks
+            self_insert_command3("C-l")()
         else:
             self_insert_command3("C-g")()
 
@@ -1103,7 +1132,7 @@ def configure(keymap):
                 checkWindow("powershell.exe", "ConsoleWindowClass")): # PowerShell
                 kill_region()
 
-            elif checkWindow(None, "HM32CLIENT"): # Hidemaru Software
+            elif checkWindow(class_name="HM32CLIENT"): # Hidemaru Software
                 kill_region()
                 delay()
                 if getClipboardText() == "":
@@ -1181,7 +1210,7 @@ def configure(keymap):
             fakeymacs.forward_direction = False
 
         elif (checkWindow("EXCEL.EXE", "EXCEL*") or # Microsoft Excel
-              checkWindow(None, "Edit")):           # Edit クラス
+              checkWindow(class_name="Edit")):      # Edit クラス
             self_insert_command("C-End", "C-S-Home")()
             fakeymacs.forward_direction = False
         else:
@@ -1239,7 +1268,10 @@ def configure(keymap):
     ##################################################
 
     def kill_buffer():
-        self_insert_command("C-F4")()
+        if checkWindow("TeXworks.exe", "Qt661QWindowIcon"): # TeXworks
+            self_insert_command("C-w")()
+        else:
+            self_insert_command("C-F4")()
 
     def switch_to_buffer():
         self_insert_command("C-Tab")()
@@ -1258,17 +1290,24 @@ def configure(keymap):
         if checkWindow("powershell.exe", "ConsoleWindowClass"): # PowerShell
             self_insert_command({"backward":"C-r", "forward":"C-s"}[direction])()
         else:
-            if fakeymacs.is_searching:
+            if fakeymacs.is_searching is None:
+                self_insert_command("C-f")()
+
+                if checkWindow("TeXworks.exe", "Qt661QWindowIcon"): # TeXworks
+                    self_insert_command("Tab", "Tab")()
+
+                fakeymacs.is_searching = False
+            else:
                 if checkWindow("EXCEL.EXE"): # Microsoft Excel
-                    if checkWindow(None, "EDTBX"): # 検索ウィンドウ
+                    if checkWindow(class_name="EDTBX"): # 検索ウィンドウ
                         self_insert_command({"backward":"A-S-f", "forward":"A-f"}[direction])()
                     else:
                         self_insert_command("C-f")()
+
+                elif checkWindow("TeXworks.exe", "Qt661QWindowIcon"): # TeXworks
+                    self_insert_command("C-g")()
                 else:
                     self_insert_command({"backward":"S-F3", "forward":"F3"}[direction])()
-            else:
-                self_insert_command("C-f")()
-                fakeymacs.is_searching = True
 
     def isearch_backward():
         isearch("backward")
@@ -1279,8 +1318,12 @@ def configure(keymap):
     def query_replace():
         if (checkWindow("sakura.exe", "EditorClient") or  # Sakura Editor
             checkWindow("sakura.exe", "SakuraView*")  or  # Sakura Editor
-            checkWindow(None, "HM32CLIENT")):             # Hidemaru Software
+            checkWindow(class_name="HM32CLIENT")):        # Hidemaru Software
             self_insert_command("C-r")()
+
+        elif checkWindow("TeXworks.exe", "Qt661QWindowIcon"): # TeXworks
+            self_insert_command("C-r")()
+            self_insert_command("Tab", "Tab", "Tab")()
         else:
             self_insert_command("C-h")()
 
@@ -1294,27 +1337,28 @@ def configure(keymap):
 
     def kmacro_end_macro():
         keymap.command_RecordStop()
+
         # キーボードマクロの終了キー「Ctl-x プレフィックスキー + ")"」の Ctl-x プレフィックスキーがマクロに
         # 記録されてしまうのを対策する（キーボードマクロの終了キーの前提を「Ctl-xプレフィックスキー + ")"」
         # としていることについては、とりあえず了承ください。）
-        if fc.ctl_x_prefix_key and len(keymap.record_seq) >= 4:
-            if (((keymap.record_seq[len(keymap.record_seq) - 1] == (ctl_x_prefix_vkey[0], True) and
-                  keymap.record_seq[len(keymap.record_seq) - 2] == (ctl_x_prefix_vkey[1], True)) or
-                 (keymap.record_seq[len(keymap.record_seq) - 1] == (ctl_x_prefix_vkey[1], True) and
-                  keymap.record_seq[len(keymap.record_seq) - 2] == (ctl_x_prefix_vkey[0], True))) and
-                keymap.record_seq[len(keymap.record_seq) - 3] == (ctl_x_prefix_vkey[1], False)):
-                   keymap.record_seq.pop()
-                   keymap.record_seq.pop()
-                   keymap.record_seq.pop()
-                   if keymap.record_seq[len(keymap.record_seq) - 1] == (ctl_x_prefix_vkey[0], False):
-                       for i in range(len(keymap.record_seq) - 1, -1, -1):
-                           if keymap.record_seq[i] == (ctl_x_prefix_vkey[0], False):
-                               keymap.record_seq.pop()
-                           else:
-                               break
-                   else:
-                       # コントロール系の入力が連続して行われる場合があるための対処
-                       keymap.record_seq.append((ctl_x_prefix_vkey[0], True))
+        if fc.ctl_x_prefix_key:
+            if (len(keymap.record_seq) >= 4 and
+                ((keymap.record_seq[-1] == (ctl_x_prefix_vkey[0], True) and
+                  keymap.record_seq[-2] == (ctl_x_prefix_vkey[1], True)) or
+                 (keymap.record_seq[-1] == (ctl_x_prefix_vkey[1], True) and
+                  keymap.record_seq[-2] == (ctl_x_prefix_vkey[0], True))) and
+                keymap.record_seq[-3] == (ctl_x_prefix_vkey[1], False)):
+                for _ in range(3):
+                    keymap.record_seq.pop()
+                if keymap.record_seq[-1] == (ctl_x_prefix_vkey[0], False):
+                    for i in range(len(keymap.record_seq) - 1, -1, -1):
+                        if keymap.record_seq[i] == (ctl_x_prefix_vkey[0], False):
+                            keymap.record_seq.pop()
+                        else:
+                            break
+                else:
+                    # コントロール系の入力が連続して行われる場合があるための対処
+                    keymap.record_seq.append((ctl_x_prefix_vkey[0], True))
 
     def kmacro_end_and_call_macro():
         def _kmacro_end_and_call_macro():
@@ -1347,6 +1391,9 @@ def configure(keymap):
             if getImeStatus():
                 fakeymacs.ime_cancel = True
 
+        if fakeymacs.is_searching == False:
+            fakeymacs.is_searching = True
+
     def newline_and_indent():
         self_insert_command("Enter", "Tab")()
 
@@ -1375,6 +1422,9 @@ def configure(keymap):
                 fakeymacs.is_undo_mode = False
             else:
                 fakeymacs.is_undo_mode = True
+
+        if fakeymacs.is_searching == False:
+            fakeymacs.is_searching = None
 
     def kill_emacs():
         self_insert_command("A-F4")()
@@ -1443,7 +1493,7 @@ def configure(keymap):
     def resetRegion():
         if fakeymacs.forward_direction is not None:
 
-            if checkWindow(None, "Edit"): # Edit クラス
+            if checkWindow(class_name="Edit"): # Edit クラス
                 # 選択されているリージョンのハイライトを解除するためにカーソルキーを発行する
                 if fakeymacs.forward_direction:
                     self_insert_command("Right")()
@@ -1546,6 +1596,7 @@ def configure(keymap):
         key = re.sub(r"(^|-)(C-)", rf"\1{fc.side_of_ctrl_key}\2", key)
         key = re.sub(r"(^|-)(A-)", rf"\1{fc.side_of_alt_key}\2", key)
         key = re.sub(r"(^|-)(W-)", rf"\1{fc.side_of_win_key}\2", key)
+        key = re.sub(r"(^|-)(U.-)", rf"\1L\2", key)
         return key
 
     def kbd(keys):
@@ -1613,32 +1664,6 @@ def configure(keymap):
     def keyInput(key_list):
         return list(map(usjisInput, key_list))
 
-    def commandPlay(command):
-        # モディファイアを離す（keymap.command_RecordPlay 関数を参考）
-        modifier = keymap.modifier
-        input_seq = []
-        for vk_mod in keymap.vk_mod_map.items():
-            if keymap.modifier & vk_mod[1]:
-                input_seq.append(pyauto.KeyUp(vk_mod[0]))
-        pyauto.Input.send(input_seq)
-        keymap.modifier = 0
-
-        command()
-
-        # モディファイアを戻す（keymap.command_RecordPlay 関数を参考）
-        keymap.modifier = 0
-        input_seq = []
-        for vk_mod in keymap.vk_mod_map.items():
-            # 「Time stamp Inversion happend.」メッセージがでると、キーの繰り返し入力後にShift キーが
-            # 押されたままの状態となる。根本的な対策ではないが、Shift キーの 押下の状態の復元を除外する
-            # ことで、暫定的な対策とする。（Shift キーは押しっぱなしにするキーではないので、押した状態
-            # を復元しなくともほとんどの場合、問題は起きない）
-            if vk_mod[0] not in [VK_LSHIFT, VK_RSHIFT]:
-                if modifier & vk_mod[1]:
-                    input_seq.append(pyauto.KeyDown(vk_mod[0]))
-                    keymap.modifier |= vk_mod[1]
-        pyauto.Input.send(input_seq)
-
     command_dict = {}
 
     def define_key(window_keymap, keys, command, skip_check=True):
@@ -1674,8 +1699,8 @@ def configure(keymap):
 
                     def _command1():
                         key = key_list[0]
-                        if key in fakeymacs.emacs_exclution_key:
-                            InputKeyCommand(key)()
+                        if key in fakeymacs.emacs_exclusion_key:
+                            getKeyCommand(keymap_base, key)()
                         else:
                             command()
                 else:
@@ -1686,7 +1711,7 @@ def configure(keymap):
                 return command
 
         def _keyCommand2(key_list):
-            _command1 = _keyCommand1(key_list)
+            _command1 = command_dict[(window_keymap, tuple(key_list))] = _keyCommand1(key_list)
             up_key = key_list[0].startswith("U-")
 
             if callable(_command1):
@@ -1708,19 +1733,11 @@ def configure(keymap):
                             fakeymacs.delayed_command = None
                             _command()
 
-                def _command3():
-                    if fakeymacs.repeat_counter == 1 or fakeymacs.is_playing_kmacro:
-                        _command2()
-                    else:
-                        keymap.delayedCall(lambda: commandPlay(_command2), 0)
-
-                return _command3
+                return _command2
             else:
                 return _command1
 
         for key_list in kbd(keys):
-            command_dict[(window_keymap, tuple(key_list))] = _keyCommand1(key_list)
-
             for pos_list in keyPos(key_list):
                 w_keymap = window_keymap
                 for key in pos_list[:-1]:
@@ -1730,10 +1747,10 @@ def configure(keymap):
                 if len(pos_list) == 1:
                     # Alt キーを単押しした際に、カーソルがメニューへ移動しないようにするための対策
                     # （https://www.haijin-boys.com/discussions/4583）
-                    if re.match(r"O-LAlt$", pos_list[0], re.IGNORECASE):
+                    if re.fullmatch(r"O-LAlt", pos_list[0], re.IGNORECASE):
                         window_keymap["D-LAlt"] = "D-LAlt", "(255)"
 
-                    elif re.match(r"O-RAlt$", pos_list[0], re.IGNORECASE):
+                    elif re.fullmatch(r"O-RAlt", pos_list[0], re.IGNORECASE):
                         window_keymap["D-RAlt"] = "D-RAlt", "(255)"
 
     def define_key2(window_keymap, keys, command):
@@ -1797,19 +1814,27 @@ def configure(keymap):
         if usjis_conv:
             key_list = keyInput(key_list)
 
+        if "S-" in key_list[-1]:
+            shift_check = True
+        else:
+            shift_check = False
+
         def _func():
-            # 「define_key(keymap_base, "W-S-m", self_insert_command("W-S-m"))」のような設定を
-            # した場合、 Shift に RShift を使うと正常に動作しない。その対策。
-            if (keymap.modifier & keyhac_keymap.MODKEY_SHIFT_R and
-                (keymap.modifier & (keyhac_keymap.MODKEY_WIN_L | keyhac_keymap.MODKEY_WIN_R) or
-                 keymap.modifier & (keyhac_keymap.MODKEY_ALT_L | keyhac_keymap.MODKEY_ALT_R)) and
-                "S-" in key_list[-1]):
-                key_list[-1] = re.sub(r"(^|-)(S-)", r"\1R\2", key_list[-1])
+            key_list2 = list(key_list)
+
+            if shift_check:
+                # 「define_key(keymap_base, "W-S-m", self_insert_command("W-S-m"))」のような設定を
+                # した場合、 Shift に RShift を使うと正常に動作しない。その対策。
+                if (keymap.modifier & keyhac_keymap.MODKEY_SHIFT_R and
+                    (keymap.modifier & (keyhac_keymap.MODKEY_WIN_L | keyhac_keymap.MODKEY_WIN_R) or
+                     keymap.modifier & (keyhac_keymap.MODKEY_ALT_L | keyhac_keymap.MODKEY_ALT_R))):
+                    key_list2[-1] = re.sub(r"(^|-)(S-)", r"\1R\2", key_list2[-1])
 
             if fakeymacs.shift_down:
-                key_list2 = ["D-Shift"] + key_list + ["U-Shift"]
-            else:
-                key_list2 = key_list
+                key_list2 = ["D-Shift"] + key_list2 + ["U-Shift"]
+
+            if fakeymacs.shift_down2:
+                key_list2 = ["U-Shift"] + key_list2 + ["D-Shift"]
 
             keymap.InputKeyCommand(*key_list2)()
 
@@ -1919,13 +1944,14 @@ def configure(keymap):
     def reset_search(func):
         def _func():
             func()
-            fakeymacs.is_searching = False
+            if fakeymacs.is_searching:
+                fakeymacs.is_searching = None
         return _func
 
     def repeat(func):
         def _func():
             if fakeymacs.repeat_counter > fc.repeat_max:
-                print("コマンドのリピート回数の最大値を超えています")
+                print(f"コマンドのリピート回数の最大値 {fc.repeat_max} を超えています")
                 repeat_counter = fc.repeat_max
             else:
                 repeat_counter = fakeymacs.repeat_counter
@@ -2363,9 +2389,9 @@ def configure(keymap):
         def ei_popBalloon(ime_mode_status):
             if not fakeymacs.is_playing_kmacro:
                 if fc.emacs_ime_mode_balloon_message:
-                    # Qt5*QWindowIcon にマッチするクラスをもつアプリは入力文字にバルーンヘルプが
-                    # 被るので、バルーンヘルプの表示対象から外す
-                    if not checkWindow(None, "Qt5*QWindowIcon"):
+                    # LINE アプリなど、Qt*QWindowIcon にマッチするクラスをもつアプリは入力文字に
+                    # バルーンヘルプが被るので、バルーンヘルプの表示対象から外す
+                    if not checkWindow(class_name="Qt*QWindowIcon"):
                         if ime_mode_status:
                             try:
                                 keymap.popBalloon("emacs_ime_mode", fc.emacs_ime_mode_balloon_message)
@@ -2456,8 +2482,8 @@ def configure(keymap):
     ###########################################################################
 
     def is_global_target(window):
-        if (window.getProcessName() in fc.transparent_target or
-            window.getProcessName() in fc.transparent_target_class):
+        if (transparent_target.match(window.getProcessName()) or
+            transparent_target_class.match(window.getClassName())):
             return False
         else:
             return True
@@ -2480,19 +2506,18 @@ def configure(keymap):
 
     if fc.use_alt_digit_key_for_f1_to_f12:
         for mod1, mod2, mod3 in itertools.product(["", "W-"], ["", "C-"], ["", "S-"]):
-            mod = mod1 + mod2 + mod3
+            mod = "A-" + mod1 + mod2 + mod3
 
-            mkey = "A-" + mod
             for i in range(10):
                 define_key(keymap_global,
-                           mkey + f"{(i + 1) % 10}", self_insert_command(mod + vkToStr(VK_F1 + i)))
+                           mod + f"{(i + 1) % 10}", self_insert_command(mod + vkToStr(VK_F1 + i)))
 
-            define_key(keymap_global, mkey + "-", self_insert_command(mod + vkToStr(VK_F11)))
+            define_key(keymap_global, mod + "-", self_insert_command(mod + vkToStr(VK_F11)))
 
             if is_japanese_keyboard:
-                define_key(keymap_global, mkey + "^", self_insert_command(mod + vkToStr(VK_F12)))
+                define_key(keymap_global, mod + "^", self_insert_command(mod + vkToStr(VK_F12)))
             else:
-                define_key(keymap_global, mkey + "=", self_insert_command(mod + vkToStr(VK_F12)))
+                define_key(keymap_global, mod + "=", self_insert_command(mod + vkToStr(VK_F12)))
 
 
     ###########################################################################
@@ -2534,6 +2559,8 @@ def configure(keymap):
 
                 if process_name is None or process_name == process_name2:
                     class_name = window.getClassName()
+
+                    # ハイフンの前に見えない文字がある場合の対策
                     title = re.sub(r".* ‎- ", r"", window.getText())
 
                     # RemoteApp を利用する際のおまじない
@@ -2543,8 +2570,8 @@ def configure(keymap):
                         pass
 
                     elif class_name == "Emacs" or title != "":
-                        if (not re.match(fc.window_operation_exclusion_class, class_name) and
-                            not re.match(fc.window_operation_exclusion_process, process_name2)):
+                        if (not re.fullmatch(fc.window_operation_exclusion_class, class_name) and
+                            not re.fullmatch(fc.window_operation_exclusion_process, process_name2)):
 
                             # バックグラウンドで起動している UWPアプリが window_list に登録されるのを抑制する
                             # （http://mrxray.on.coocan.jp/Delphi/plSamples/320_AppList.htm）
@@ -2943,3 +2970,6 @@ def configure(keymap):
 
     # 個人設定ファイルのセクション [section-extension-space_fn] を読み込んで実行する
     exec(readConfigPersonal("[section-extension-space_fn]"), dict(globals(), **locals()))
+
+    # 個人設定ファイルのセクション [section-extension-capslock_key] を読み込んで実行する
+    exec(readConfigPersonal("[section-extension-capslock_key]"), dict(globals(), **locals()))

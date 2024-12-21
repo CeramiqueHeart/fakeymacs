@@ -8,18 +8,36 @@ try:
     # 設定されているか？
     fc.vscode_target
 except:
-    # VSCode 用のキーバインドを利用するアプリケーションソフトを指定する
-    # （ブラウザを指定した場合には、VS Code Web の画面で利用可能となります）
-    fc.vscode_target  = ["Code.exe"]
-    fc.vscode_target += ["chrome.exe",
-                         "msedge.exe",
-                         "firefox.exe",
-                         ]
+    # VSCode 用のキーバインドを利用するアプリケーションソフト（ブラウザアプリを除く）を指定する
+    fc.vscode_target = ["Code.exe",
+                        ]
+
+try:
+    # 設定されているか？
+    fc.cursor_target
+except:
+    # Cursor 用のキーバインドを利用するアプリケーションソフトを指定する
+    fc.cursor_target = ["Cursor.exe",
+                        ]
+
+fc.vscode_target += fc.cursor_target
+
+try:
+    # 設定されているか？
+    fc.vscode_browser_target
+except:
+    # VS Code Web の画面で VSCode 用のキーバインドを利用するブラウザアプリを指定する
+    fc.vscode_browser_target = ["chrome.exe",
+                                "msedge.exe",
+                                "firefox.exe",
+                                ]
+
+fc.vscode_target += fc.vscode_browser_target
 
 # fc.vscode_target に設定しているアプリケーションソフトが fc.not_emacs_target に設定してある場合、
 # それを除外する
 for target in fc.vscode_target:
-    if target in fc.not_emacs_target:
+    if any(fnmatch.fnmatch(target, app) for app in fc.not_emacs_target if type(app) is str):
         fc.vscode_target.remove(target)
 
 try:
@@ -31,10 +49,36 @@ except:
     #   キーが全角文字で入力されることが無くなります）
     # （同じキーを指定することもできます）
     # （Fakeymacs のキーに Meta キー（M-）は指定できません）
-    fc.vscode_prefix_key  = []
+    fc.vscode_prefix_key = [["C-k", "C-A-k"]]
 
-# プレフィックスキー C-k は デフォルトで C-A-k に置き換えられるものとする
-fc.vscode_prefix_key += [["C-k", "C-A-k"]]
+try:
+    # 設定されているか？
+    fc.cursor_prefix_key
+except:
+    # 置き換えするプレフィックスキーの組み合わせ（Cursor のキー、Fakeymacs のキー）を指定する（複数指定可）
+    # （置き換えた Fakeymacs のプレフィックスキーを利用することにより、プレフィックスキーの後に入力する
+    #   キーが全角文字で入力されることが無くなります）
+    # （同じキーを指定することもできます）
+    # （Fakeymacs のキーに Meta キー（M-）は指定できません）
+    fc.cursor_prefix_key = [["C-m", "C-A-m"]]
+
+try:
+    # 設定されているか？
+    fc.vscode_replace_key
+except:
+    # 置き換えするキーの組み合わせ（VSCode のキー、Fakeymacs のキー）を指定する（複数指定可）
+    # （Fakeymacs のキーに Meta キー（M-）は指定できません）
+    fc.vscode_replace_key = []
+
+try:
+    # 設定されているか？
+    fc.cursor_replace_key
+except:
+    # 置き換えするキーの組み合わせ（Cursor のキー、Fakeymacs のキー）を指定する（複数指定可）
+    # （Fakeymacs のキーに Meta キー（M-）は指定できません）
+    fc.cursor_replace_key = [["C-e", "C-A-e"],
+                             ["C-l", "C-A-l"],
+                             ]
 
 try:
     # 設定されているか？
@@ -74,6 +118,8 @@ except:
     #   2：C-g を２回連続して押下した場合に Esc キーを発行する）
     fc.esc_mode_in_keyboard_quit = 1
 
+# --------------------------------------------------------------------------------------------------
+
 class FakeymacsVSCode:
     pass
 
@@ -86,9 +132,11 @@ fakeymacs_vscode.post_processing = None
 def is_vscode_target(window):
     if (fakeymacs.is_emacs_target == True and
         window.getProcessName() in fc.vscode_target and
-        window.getClassName() in ["Chrome_WidgetWin_1", "MozillaWindowClass"]):
+        window.getClassName() in ["Chrome_WidgetWin_1", "MozillaWindowClass", "RAIL_WINDOW"]):
+        fakeymacs.is_vscode_target = True
         return True
     else:
+        fakeymacs.is_vscode_target = False
         return False
 
 if fc.use_emacs_ime_mode:
@@ -110,7 +158,7 @@ def define_key_v(keys, command, skip_check=True):
 
     if callable(command):
         command = makeKeyCommand(keymap_emacs, keys, command,
-                                 lambda: (checkWindow(process_name="Code.exe") or
+                                 lambda: (keymap.getWindow().getProcessName() not in fc.vscode_browser_target or
                                           checkWindow(text="* - Visual Studio Code*")))
 
     define_key(keymap_vscode, keys, command, False)
@@ -504,7 +552,7 @@ def mergeEmacsMultiStrokeKeymap():
 ## keymap_emacs キーマップのマルチストロークキーの設定を keymap_vscode キーマップにマージする
 keymap_vscode.applying_func = mergeEmacsMultiStrokeKeymap
 
-## プレフィックスキーの設定
+## VSCode 用プレフィックスキーの置き換え設定
 for pkey1, pkey2 in fc.vscode_prefix_key:
     define_key_v(pkey2, keymap.defineMultiStrokeKeymap(f"<VSCode> {pkey1}"))
 
@@ -609,8 +657,44 @@ else:
 if use_usjis_keyboard_conversion:
     define_key_v("C-=", zoom_in)
 
-## vscode_extensions 拡張機能の読み込み
-exec(readConfigExtension(r"vscode_extensions\config.py"), dict(globals(), **locals()))
+## キーの置き換え設定
+for key1, key2 in fc.vscode_replace_key:
+    define_key_v(key2, self_insert_command(key1))
+
+# --------------------------------------------------------------------------------------------------
+
+# Cursor 用の追加設定
+
+def define_key_c(keys, command):
+    define_key(keymap_cursor, keys, command)
+
+def is_cursor_target(window):
+    if (fakeymacs.is_vscode_target == True and
+        window.getProcessName() in fc.cursor_target):
+        return True
+    else:
+        return False
+
+if fc.use_emacs_ime_mode:
+    keymap_cursor = keymap.defineWindowKeymap(check_func=lambda wnd: is_cursor_target(wnd) and not is_emacs_ime_mode(wnd))
+else:
+    keymap_cursor = keymap.defineWindowKeymap(check_func=is_cursor_target)
+
+## Cursor 用プレフィックスキーの置き換え設定
+for pkey1, pkey2 in fc.cursor_prefix_key:
+    define_key_c(pkey2, keymap.defineMultiStrokeKeymap(f"<Cursor> {pkey1}"))
+
+    for vkey in vkeys():
+        key = vkToStr(vkey)
+        for mod1, mod2, mod3, mod4 in itertools.product(["", "W-"], ["", "A-"], ["", "C-"], ["", "S-"]):
+            mkey = mod1 + mod2 + mod3 + mod4 + key
+            define_key_c(f"{pkey2} {mkey}", self_insert_command_v(pkey1, mkey))
+
+## キーの置き換え設定
+for key1, key2 in fc.cursor_replace_key:
+    define_key_c(key2, self_insert_command(key1))
+
+# --------------------------------------------------------------------------------------------------
 
 ## config_personal.py ファイルの読み込み
 exec(readConfigExtension(r"vscode_key\config_personal.py", msg=False), dict(globals(), **locals()))
