@@ -1,3 +1,4 @@
+#+STARTUP: showall indent
 
 * Fakeymacs extension - chrome_quickey -
 

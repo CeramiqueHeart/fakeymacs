@@ -219,10 +219,6 @@ def configure(keymap):
                                "ttermpro.exe",           # TeraTerm
                                "MobaXterm.exe",          # MobaXterm
                                "TurboVNC.exe",           # TurboVNC
-                               "vncviewer.exe",          # UltraVNC
-                               "vncviewer64.exe",        # UltraVNC
-                               "Poderosa.exe",           # Poderosa
-                               "RLogin.exe",             # RLogin
                                "vncviewer*.exe",         # UltraVNC
                                [None, None, "さくらのクラウドシェル (リモート)"],
                                ]
@@ -331,7 +327,7 @@ def configure(keymap):
     # IME をトグルで切り替えるキーを指定する（複数指定可）
     fc.toggle_input_method_key = []
     fc.toggle_input_method_key += ["C-Yen"]
-    # fc.toggle_input_method_key += ["C-o"]
+    fc.toggle_input_method_key += ["C-o"]
     # fc.toggle_input_method_key += ["O-LAlt"]
 
     #---------------------------------------------------------------------------------------------------
@@ -1895,8 +1891,6 @@ def configure(keymap):
             digit_argument(number)
         return _func
 
-    fakeymacs.shift_down = False
-
     def mark(func, forward_direction):
         def _func():
             if fakeymacs.is_marked:
@@ -2057,7 +2051,6 @@ def configure(keymap):
     ## マルチストロークキーの設定
     define_key(keymap_emacs, "Ctl-x",  keymap.defineMultiStrokeKeymap(fc.ctl_x_prefix_key))
     define_key(keymap_emacs, "C-q",    keymap.defineMultiStrokeKeymap("C-q"))
-    define_key(keymap_emacs, "C-o",    keymap.defineMultiStrokeKeymap("C-o"))
     define_key(keymap_emacs, "M-",     keymap.defineMultiStrokeKeymap("Esc"))
     define_key(keymap_emacs, "M-g",    keymap.defineMultiStrokeKeymap("M-g"))
     define_key(keymap_emacs, "M-g M-", keymap.defineMultiStrokeKeymap("M-g Esc"))
@@ -2129,11 +2122,7 @@ def configure(keymap):
     define_key(keymap_base, "C-(243)", toggle_input_method) # C-<半角／全角> キー
     define_key(keymap_base, "C-(244)", toggle_input_method) # C-<半角／全角> キー
     define_key(keymap_base, "(240)",   toggle_input_method) # CapsLock キー
-    define_key(keymap_base, "S-(240)", toggle_input_method) # CapsLock キー
-    
-    define_key(keymap_emacs, "C-o C-o", enable_input_method)
-    define_key(keymap_emacs, "C-o C-i", disable_input_method)
-
+    define_key(keymap_base, "S-(240)", toggle_input_method) # S-CapsLock キー
 
     ## 「ファイル操作」のキー設定
     define_key(keymap_emacs, "Ctl-x C-f", reset_search(reset_undo(reset_counter(reset_mark(find_file)))))
@@ -2212,7 +2201,6 @@ def configure(keymap):
     define_key(keymap_emacs, "C-z",       reset_search(reset_counter(reset_mark(undo))))
     define_key(keymap_emacs, "C-_",       reset_search(reset_undo(reset_counter(reset_mark(undo)))))
     define_key(keymap_emacs, "C-@",       reset_search(reset_undo(reset_counter(set_mark_command))))
-
     define_key(keymap_emacs, "C-Space",   reset_search(reset_undo(reset_counter(set_mark_command))))
     define_key(keymap_emacs, "Ctl-x h",   reset_search(reset_undo(reset_counter(mark_whole_buffer))))
     define_key(keymap_emacs, "Ctl-x C-p", reset_search(reset_undo(reset_counter(mark_page))))
@@ -2240,7 +2228,7 @@ def configure(keymap):
     define_key(keymap_emacs, "Enter",     reset_undo(reset_counter(reset_mark(repeat(newline)))))
     define_key(keymap_emacs, "C-m",       reset_undo(reset_counter(reset_mark(repeat(newline)))))
     define_key(keymap_emacs, "C-j",       reset_undo(reset_counter(reset_mark(newline_and_indent))))
-    #define_key(keymap_emacs, "C-o",       reset_undo(reset_counter(reset_mark(repeat(open_line)))))
+    define_key(keymap_emacs, "C-o",       reset_undo(reset_counter(reset_mark(repeat(open_line)))))
     define_key(keymap_emacs, "Tab",       reset_undo(reset_counter(reset_mark(repeat(indent_for_tab_command)))))
     define_key(keymap_emacs, "C-g",       reset_search(reset_counter(reset_mark(keyboard_quit))))
     define_key(keymap_emacs, "Ctl-x C-c", reset_search(reset_undo(reset_counter(reset_mark(kill_emacs)))))

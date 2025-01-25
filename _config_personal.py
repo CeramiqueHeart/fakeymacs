@@ -134,7 +134,7 @@ fc.scroll_key = ["M-v", "C-v"]
 # Emacs 日本語入力モードを使うかどうかを指定する（True: 使う、False: 使わない）
 fc.use_emacs_ime_mode = False
 
-# Emacs日本語入力モードが有効なときに表示するバルーンメッセージを指定する
+# Emacs 日本語入力モードが有効なときに表示するバルーンメッセージを指定する
 # fc.emacs_ime_mode_balloon_message = None
 fc.emacs_ime_mode_balloon_message = "▲"
 
@@ -147,7 +147,7 @@ fc.use_ime_status_reset = False
 # IME をトグルで切り替えるキーを指定する（複数指定可）
 fc.toggle_input_method_key = []
 fc.toggle_input_method_key += ["C-Yen"]
-# fc.toggle_input_method_key += ["C-o"]
+fc.toggle_input_method_key += ["C-o"]
 # fc.toggle_input_method_key += ["O-LAlt"]
 
 #---------------------------------------------------------------------------------------------------
