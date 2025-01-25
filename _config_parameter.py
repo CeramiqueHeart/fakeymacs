@@ -575,6 +575,9 @@ if 0:
 
 # VSCode 用のキーの設定を行う
 if 0:
+    # VSCode の settings.json に次の行の設定を追加してご利用ください
+    # "window.title": "${dirty}${activeEditorShort}${separator}${rootName}${separator}${appName} - ${focusedView}"
+
     fc.vscode_prefix_key  = [["C-k", "C-A-k"]]
     fc.cursor_prefix_key  = [["C-m", "C-A-m"]]
     fc.vscode_replace_key = []
@@ -582,7 +585,6 @@ if 0:
                              ["C-l", "C-A-l"],
                              ]
     fc.use_ctrl_atmark_for_mark = False
-    fc.use_direct_input_in_vscode_terminal = False
     fc.esc_mode_in_keyboard_quit = 1
     exec(readConfigExtension(r"vscode_key\config.py"), dict(globals(), **locals()))
 
@@ -606,7 +608,7 @@ if 0:
 # ■ Emacs 関連
 # --------------------------------------------------------------------------------------------------
 
-# Emacs をターミナルソフトで動かす場合に event-apply-modifier を使ってキーの置き換えを行う
+# Emacs をターミナルで動かす場合に event-apply-modifier を使ってキーの置き換えを行う
 if 0:
     fc.emacs_terminal = ["ubuntu*.exe",
                          [None, None,  "さくらのクラウドシェル (リモート)"],

@@ -96,6 +96,8 @@ try:
 except:
     # パネルのターミナル内で４つのキー（C-k、C-r、C-s、C-y）のダイレクト入力機能を使うかどうかを
     # 指定する（True: 使う、False: 使わない）
+    # （この設定は現在非推奨です。README に記載しているとおり、VSCode の settings.json に
+    #   window.title の設定を行ってご利用ください）
     fc.use_direct_input_in_vscode_terminal = False
 
 try:
@@ -221,10 +223,13 @@ def post(func):
             fakeymacs_vscode.post_processing = None
     return _func
 
+pattern1 = re.compile("|".join([rf" - {v}$" for v in ["Terminal", "ターミナル"]]))
+pattern2 = re.compile("|".join([rf"^{t} .* -$" for t in fc.terminal_list_for_direct_input]))
+
 def is_terminal_for_direct_input():
-    for terminal in fc.terminal_list_for_direct_input:
-        if re.search(rf"(^| - ){re.escape(terminal)} - ", keymap.getWindow().getText()):
-            return True
+    title = keymap.getWindow().getText()
+    if pattern1.search(title) or pattern2.search(title):
+        return True
     return False
 
 ## ファイル操作

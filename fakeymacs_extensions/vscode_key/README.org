@@ -41,11 +41,9 @@ True に設定した場合でも Toggle Terminal 用のキーとして C-<半角
 ※ fc.use_direct_input_in_vscode_terminal 変数は初期値を False（使わない）としており、
 仕様を理解した方のみ使う機能としています。fc.use_direct_input_in_vscode_terminal 変数を True に
 した際の仕様については、以降の説明を参照してください。
-
-※ fc.use_direct_input_in_vscode_terminal 変数が False の場合でも、fc.terminal_list_for_direct_input
-変数に設定しているターミナルをエディタ領域で開いた場合には、４つのキー（C-k、C-r、C-s、C-y）の
-ダイレクト入力が機能します。パネルのターミナルでダイレクト入力機能を利用する場合と異なり、
-現在の場所を認識する必要がなくなるため、シンプルな利用形態になると思います。
+なお、2025/01/21 に実施したエンハンス対応により、VSCode の settings.json に window.title の設定を
+行えば、fc.use_direct_input_in_vscode_terminal 変数を True にする必要がなくなりました。window.title
+の設定についても以降の説明を参照してください。
 
 ※ fc.esc_mode_in_keyboard_quit 変数の設定値には、次のいずれかの値を指定できます。
 - 1：Esc キーを常に発行する
@@ -192,10 +190,18 @@ keyboard_quit（C-A-g）を利用してください。（fc.esc_mode_in_keyboard
 
 ※ C-@ は、fc.use_ctrl_atmark_for_mark 変数が False の場合に機能します。
 
-※ fc.use_direct_input_in_vscode_terminal 変数を True にしている場合には、上記のいずれかのキーを押下して
-ターミナルに移行することで、４つのキー（C-k、C-r、C-s、C-y）のダイレクト入力ができるようになります。
-fc.use_direct_input_in_vscode_terminal 変数が False（初期値）の場合でも、fc.side_of_ctrl_key 変数で設定した
-側でない Ctrl キーを使うか C-q を前置することで、４つのキーのダイレクト入力を行うことができます。
+※ ターミナルで４つのキー（C-k、C-r、C-s、C-y）のダイレクト入力をできるようにするためには、
+VSCode の settings.json に次の window.title の設定を追加してください。
+
+#+BEGIN_EXAMPLE
+"window.title": "${dirty}${activeEditorShort}${separator}${rootName}${separator}${appName} - ${focusedView}"
+#+END_EXAMPLE
+
+※ fc.use_direct_input_in_vscode_terminal 変数を True にすることでも、同様の機能を利用することが
+できます。この機能を利用する場合は、上記のいずれかのキーを押下してターミナルに移行するように
+してください。
+ただし、window.title の設定を行う方法の方がマウスでビューを切り替えられるなどメリットが多いため、
+fc.use_direct_input_in_vscode_terminal 変数を True にする方法は、非推奨の方法となりました。
 
 ※ ターミナルで C-k を利用できるようにするには、VSCode の 設定で terminal.integrated.allowChords
 を false にする必要があります。
@@ -209,9 +215,14 @@ fc.use_direct_input_in_vscode_terminal 変数が False（初期値）の場合�
 
 - https://note.com/kokoronopython/n/nbf09b3b5db46
 
-※ fc.use_direct_input_in_vscode_terminal 変数を True にしている場合にターミナルから抜ける場合は、
+※ fc.use_direct_input_in_vscode_terminal 変数を True にしている場合、ターミナルから抜けるには
 次のキーを利用するようにしてください。先に説明した４つのキーが VSCode のショートカットキーとして
 認識されるように戻ります。
+また、マウスでビューの変更をしたり、ターミナルのシェルを終了してパネルをクロースした場合などに、
+現在の場所の認識に齟齬が発生することがあります。
+その場合も次のいずれかのキーを押下することにより、Fakeymacs に現在の場所を再認識させるようにして
+ください。なお、これらの利用上の制約は、window.title の設定を行う方法の場合には発生しません。
+このため、fc.use_direct_input_in_vscode_terminal 変数を True にする方法は非推奨となりました。
 
 |----------------+------------------------------+-------------------------------------+---------------------|
 | Keybind        | Function                     | VSCode Command                      | Description         |
@@ -225,10 +236,6 @@ fc.use_direct_input_in_vscode_terminal 変数が False（初期値）の場合�
 | C-A-<数字キー> | switch_focus(<数字キーの値>) | Focus Side Bar or n-th Editor Group |                     |
 |----------------+------------------------------+-------------------------------------+---------------------|
 
-※ マウスのクリックでカーソル位置の変更したり、ターミナルのシェルを終了してパネルをクロースした際などに、
-現在の場所の認識に齟齬が発生することがあります。その場合は、上記のいずれかのキーを押下することにより、
-Fakeymacs に現在の場所を再認識させるようにしてください。
-
 ****  ●「ターミナル操作」のキー設定（エディタ領域ターミナル）
 
 |-----------------+--------------------------------+----------------------------------------------+---------------------|
@@ -241,10 +248,7 @@ Fakeymacs に現在の場所を再認識させるようにしてください。
 
 ※ エディタ領域にターミナルを開く場合には、上記のキーを利用してください。
 
-※ エディタ領域に表示するターミナルでは、ウィンドウのタイトルからターミナルが選択されていることを
-判別できます。このため、fc.terminal_list_for_direct_input 変数に設定しているターミナルについては、
-fc.use_direct_input_in_vscode_terminal 変数の設定に関わらず、４つのキー（C-k、C-r、C-s、C-y）の
-ダイレクト入力が行われるようにしています。
+※ この機能は、fc.terminal_list_for_direct_input 変数に設定しているターミナルに対し、動作します。
 
 **** ● 「その他」のキー設定
 
@@ -264,7 +268,7 @@ True にした場合に Esc を入力するには、Esc を二回押下してく
 
 - https://code.visualstudio.com/docs/editor/intellisense
 
-*** Cursor 専用のキーバインド
+*** Cursor AI 専用のキーバインド
 
 Cursor を利用する場合、AI のインラインアシスタント機能を起動するショートカットキー Ctrl+k が
 Emacs キーバインドと重複するため、キーの変更が必要となります。
@@ -301,7 +305,7 @@ Cursor の Preferences: Open Keyboard Shortcuts (JSON) の機能で keybindings.
 また、Cursor には VSCode 用のキーマップ keymap_vscode が適用される他に、Cursor 用のキーマップ
 keymap_cursor が適用されます。このキーマップでは、次の設定により、キーの置き換えが可能となっています。
 
-**** ● Cursor 用プレフィックスキーの置き換え設定
+**** ● Cursor AI 用プレフィックスキーの置き換え設定
 
 |-------------------------------------+-------------------------------------+----------------------|
 | Cursor's prefix key                 | Fakeymacs's prefix key              | Description          |
