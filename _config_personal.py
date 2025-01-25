@@ -171,7 +171,7 @@ fc.set_input_method_key += [["(26)", "(22)"]]
 # fc.set_input_method_key += [["C-j", None]]
 
 ## C-j で英数入力、C-o で日本語入力となる（toggle_input_method_key の設定より優先）
-# fc.set_input_method_key += [["C-j", "C-o"]]
+fc.set_input_method_key += [["C-j", "C-o"]]
 
 ## C-j で英数入力、C-i で日本語入力となる（C-i が Tab として利用できなくなるが、トグルキー C-o との併用可）
 # fc.set_input_method_key += [["C-j", "C-i"]]
